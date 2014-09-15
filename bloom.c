@@ -8,7 +8,7 @@ char _get(uint32_t index, bfilter_t *bf);
 uint32_t _fingerprint(char *str);
 uint32_t _hash(uint32_t fingerprint, uint32_t size, uint32_t hash_num);
 
-bfilter_t *setup(int size, int num_hashes) {
+bfilter_t *bf_setup(int size, int num_hashes) {
 	int min_slots = size / (sizeof(slot_t));
 	uint32_t num_boxes = 1;
 	while(num_boxes < min_slots) num_boxes = num_boxes << 1;
@@ -24,7 +24,7 @@ bfilter_t *setup(int size, int num_hashes) {
 	return bf;
 }
 
-void add_member(char *elt, bfilter_t *bf) {
+void bf_add_member(char *elt, bfilter_t *bf) {
 	uint32_t fprint = _fingerprint(elt);
 	int k;
 	for (k = 0; k < bf->num_hashes; k++) {
@@ -33,7 +33,7 @@ void add_member(char *elt, bfilter_t *bf) {
 	}
 }
 
-char is_member(char *elt, bfilter_t *bf) {
+char bf_is_member(char *elt, bfilter_t *bf) {
 	uint32_t fprint = _fingerprint(elt);
 	int k;
 	for (k = 0; k < bf->num_hashes; k++) {
