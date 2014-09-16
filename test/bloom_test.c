@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <assert.h>
 
 #define BUF_SIZE 4096
 
@@ -13,7 +14,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	bfilter_t *bf = bf_setup(1 << 22, 4); // ~ a megabyte
+	bfilter_t *bf = bf_setup((1 << 21), 2);
 	int fd = open(argv[1], O_RDONLY);
 
 	if (fd < 0) return 1;
@@ -27,11 +28,14 @@ int main(int argc, char **argv) {
 		char *c = buf;
 		char *end;
 		while (1) {
-			char *end = strpbrk(c, "\n");
-			if (end == NULL) break;
+			while(*c == ' ' || *c == '\n') c++;
+			end = c;
+			while(*end != '\0' && *end != '\n' && *end != ' ') end++;
+
+			if (*end == '\0' ) break;
 			*end = '\0';
-			printf("adding %s\n", c);
 			bf_add_member(c, bf);
+			assert(bf_is_member(c, bf));
 			c = end + 1;
 		}
 
@@ -43,7 +47,9 @@ int main(int argc, char **argv) {
 		char *c = strpbrk(buf, "\n");
 		if (c) *c = '\0';
 		if (*buf == '\0') break;
-		if (bf_is_member(buf, bf)) {
+		if (!strncmp(buf, "print", 5)) {
+			bf_stat(bf);
+		} else if (bf_is_member(buf, bf)) {
 			printf("%s is a word\n", buf);
 		} else {
 			printf("%s is not a word\n", buf);

@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 void _set(uint32_t index, bfilter_t *bf);
 char _get(uint32_t index, bfilter_t *bf);
@@ -29,6 +30,10 @@ void bf_add_member(char *elt, bfilter_t *bf) {
 	int k;
 	for (k = 0; k < bf->num_hashes; k++) {
 		int index = _hash(fprint, bf->size, k);
+		if(_get(index, bf)) {
+			write(1, elt, strlen(elt));
+			write(1, " collides\n", strlen(" collides\n"));
+		}
 		_set(index, bf);
 	}
 }
@@ -68,6 +73,29 @@ uint32_t _fingerprint(char *str) {
 }
 
 uint32_t _hash(uint32_t fingerprint, uint32_t size, uint32_t hash_num) {
-	return (fingerprint * hash_num) % size;
+	uint32_t h = 17;
+	int i;
+	for (i = 0; i < hash_num; i++) h *= h;
+	return (fingerprint * h) % size;
 }
 
+void bf_stat(bfilter_t *bf) {
+	uint32_t set_bits = 0;
+	uint32_t total_bits = 0;
+	int i;
+	for (i = 0; i < bf->num_boxes; i++) {
+		slot_t bit = 1;
+		int j;
+		for(j = 0; j < sizeof(slot_t); j++){
+			if (bit & bf->arr[i]) {
+				printf("1");
+				set_bits++;
+			} else {
+				printf("_");
+			}
+			bit = bit << 1;
+			total_bits++;
+		}
+	}
+	printf("\n%u set bits out of %u (%f)\n", set_bits, total_bits, (float)set_bits / (float)total_bits);
+}

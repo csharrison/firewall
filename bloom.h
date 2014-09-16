@@ -14,3 +14,5 @@ bfilter_t *bf_setup(int size, int num_hashes);
 void bf_add_member(char *elt, bfilter_t *bf);
 
 char bf_is_member(char *elt, bfilter_t *bf);
+
+void bf_stat(bfilter_t *bf);
