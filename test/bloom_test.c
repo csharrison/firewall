@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	sbfilter_t *sbf = sbf_setup((1 << 8), 1);
+	sbfilter_t *sbf = sbf_setup((1 << 8), 1, 16);
 	int fd = open(argv[1], O_RDONLY);
 
 	if (fd < 0) return 1;

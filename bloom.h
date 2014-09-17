@@ -1,5 +1,8 @@
 #include <inttypes.h>
 
+/*
+	BLOOM FILTER
+*/
 typedef uintmax_t slot_t;
 
 typedef struct bfilter {

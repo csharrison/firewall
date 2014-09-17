@@ -1,9 +1,11 @@
 #include "sbloom.h"
 #include <stdlib.h>
 #include <stdio.h>
-level_t *_level_setup(uint32_t size, int num_hashes);
 
-sbfilter_t *sbf_setup(uint32_t initial_size, int num_hashes) {
+level_t *_level_setup(uint32_t size, int num_hashes);
+level_t *_add_level(sbfilter_t *sbf);
+
+sbfilter_t *sbf_setup(uint32_t initial_size, int num_hashes, uint32_t growth_factor) {
 	sbfilter_t *sbf = malloc(sizeof(sbfilter_t));
 	level_t *root = _level_setup(initial_size, num_hashes);
 
@@ -12,6 +14,7 @@ sbfilter_t *sbf_setup(uint32_t initial_size, int num_hashes) {
 	sbf->num_filters = 1;
 	sbf->num_hashes = num_hashes;
 	sbf->size = initial_size;
+	sbf->growth_factor = growth_factor;
 	return sbf;
 }
 
@@ -28,7 +31,7 @@ void sbf_teardown(sbfilter_t *sbf) {
 
 void sbf_add_member(char *elt, sbfilter_t *sbf) {
 	bf_add_member(elt, sbf->last->bf);
-	if (bf_filled(sbf->last->bf, 12)) {
+	if (bf_filled(sbf->last->bf, sbf->growth_factor)) {
 		_add_level(sbf);
 	}
 }
