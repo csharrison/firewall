@@ -12,6 +12,8 @@ typedef struct bfilter {
 
 bfilter_t *bf_setup(uint32_t size, int num_hashes);
 
+void bf_teardown(bfilter_t *bf);
+
 void bf_add_member(char *elt, bfilter_t *bf);
 
 char bf_is_member(char *elt, bfilter_t *bf);

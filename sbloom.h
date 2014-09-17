@@ -14,6 +14,7 @@ typedef struct sbfilter {
 } sbfilter_t;
 
 sbfilter_t *sbf_setup(uint32_t initial_size, int num_hashes);
+void sbf_teardown(sbfilter_t *sbf);
 
 void sbf_add_member(char *elt, sbfilter_t *sbf);
 

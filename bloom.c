@@ -25,6 +25,10 @@ bfilter_t *bf_setup(uint32_t size, int num_hashes) {
 	return bf;
 }
 
+void bf_teardown(bfilter_t *bf) {
+	free(bf->arr);
+	free(bf);
+}
 
 void bf_add_member(char *elt, bfilter_t *bf) {
 	uint32_t fprint = _fingerprint(elt);

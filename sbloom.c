@@ -15,6 +15,17 @@ sbfilter_t *sbf_setup(uint32_t initial_size, int num_hashes) {
 	return sbf;
 }
 
+void sbf_teardown(sbfilter_t *sbf) {
+	level_t *node = sbf->first;
+	while (node != NULL) {
+		level_t *next = node->next;
+		bf_teardown(node->bf);
+		free(node);
+		node = next;
+	}
+	free(sbf);
+}
+
 level_t *_level_setup(uint32_t size, int num_hashes) {
 	level_t *level = malloc(sizeof(level_t));
 	bfilter_t *bf = bf_setup(size, num_hashes);
@@ -31,13 +42,14 @@ level_t *_add_level(sbfilter_t *sbf) {
 	sbf->last = child;
 
 	sbf->size += new_size;
+	sbf->num_filters++;
 	printf("growing to %u\n", sbf->size);
 	return child;
 }
 
 void sbf_add_member(char *elt, sbfilter_t *sbf) {
 	bf_add_member(elt, sbf->last->bf);
-	if (bf_filled(sbf->last->bf, 10)) {
+	if (bf_filled(sbf->last->bf, 12)) {
 		_add_level(sbf);
 	}
 }
