@@ -26,6 +26,22 @@ void sbf_teardown(sbfilter_t *sbf) {
 	free(sbf);
 }
 
+void sbf_add_member(char *elt, sbfilter_t *sbf) {
+	bf_add_member(elt, sbf->last->bf);
+	if (bf_filled(sbf->last->bf, 12)) {
+		_add_level(sbf);
+	}
+}
+
+char sbf_is_member(char *elt, sbfilter_t *sbf) {
+	level_t *node = sbf->first;
+	while (node != NULL) {
+		if (bf_is_member(elt, node->bf)) return 1;
+		node = node->next;
+	}
+	return 0;
+}
+
 level_t *_level_setup(uint32_t size, int num_hashes) {
 	level_t *level = malloc(sizeof(level_t));
 	bfilter_t *bf = bf_setup(size, num_hashes);
@@ -45,20 +61,4 @@ level_t *_add_level(sbfilter_t *sbf) {
 	sbf->num_filters++;
 	printf("growing to %u\n", sbf->size);
 	return child;
-}
-
-void sbf_add_member(char *elt, sbfilter_t *sbf) {
-	bf_add_member(elt, sbf->last->bf);
-	if (bf_filled(sbf->last->bf, 12)) {
-		_add_level(sbf);
-	}
-}
-
-char sbf_is_member(char *elt, sbfilter_t *sbf) {
-	level_t *node = sbf->first;
-	while (node != NULL) {
-		if (bf_is_member(elt, node->bf)) return 1;
-		node = node->next;
-	}
-	return 0;
 }
