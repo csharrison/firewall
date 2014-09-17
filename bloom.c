@@ -9,7 +9,7 @@ char _get(uint32_t index, bfilter_t *bf);
 uint32_t _fingerprint(char *str);
 uint32_t _hash(uint32_t fingerprint, uint32_t size, uint32_t hash_num);
 
-bfilter_t *bf_setup(int size, int num_hashes) {
+bfilter_t *bf_setup(uint32_t size, int num_hashes) {
 	int min_slots = size / (sizeof(slot_t));
 	uint32_t num_boxes = 1;
 	while(num_boxes < min_slots) num_boxes = num_boxes << 1;
@@ -25,15 +25,12 @@ bfilter_t *bf_setup(int size, int num_hashes) {
 	return bf;
 }
 
+
 void bf_add_member(char *elt, bfilter_t *bf) {
 	uint32_t fprint = _fingerprint(elt);
 	int k;
 	for (k = 0; k < bf->num_hashes; k++) {
 		int index = _hash(fprint, bf->size, k);
-		if(_get(index, bf)) {
-			write(1, elt, strlen(elt));
-			write(1, " collides\n", strlen(" collides\n"));
-		}
 		_set(index, bf);
 	}
 }
@@ -52,14 +49,20 @@ void _set(uint32_t index, bfilter_t *bf) {
 	uint32_t box_index = index / sizeof(slot_t);
 	uint32_t elt_index = index % sizeof(slot_t);
 
-	bf->arr[box_index] |= 1 << elt_index;
+	uint32_t mask = 1 << elt_index;
+	uint32_t slice = bf->arr[box_index];
+	if (! (slice & mask)) {
+		bf->arr[box_index] |= 1 << elt_index;
+		bf->set_bits++;
+	}
 }
 
 char _get(uint32_t index, bfilter_t *bf) {
 	uint32_t box_index = index / sizeof(slot_t);
 	uint32_t elt_index = index % sizeof(slot_t);
-
-	return (bf->arr[box_index] & 1 << elt_index) > 0 ? 1 : 0;
+	uint32_t mask = 1 << elt_index;
+	uint32_t slice = bf->arr[box_index];
+	return slice & mask ? 1 : 0;
 }
 
 
@@ -79,23 +82,6 @@ uint32_t _hash(uint32_t fingerprint, uint32_t size, uint32_t hash_num) {
 	return (fingerprint * h) % size;
 }
 
-void bf_stat(bfilter_t *bf) {
-	uint32_t set_bits = 0;
-	uint32_t total_bits = 0;
-	int i;
-	for (i = 0; i < bf->num_boxes; i++) {
-		slot_t bit = 1;
-		int j;
-		for(j = 0; j < sizeof(slot_t); j++){
-			if (bit & bf->arr[i]) {
-				printf("1");
-				set_bits++;
-			} else {
-				printf("_");
-			}
-			bit = bit << 1;
-			total_bits++;
-		}
-	}
-	printf("\n%u set bits out of %u (%f)\n", set_bits, total_bits, (float)set_bits / (float)total_bits);
+char bf_filled(bfilter_t *bf, uint32_t factor) {
+	return bf->set_bits * factor >= bf->size;
 }

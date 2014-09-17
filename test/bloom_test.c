@@ -1,4 +1,4 @@
-#include "../bloom.h"
+#include "../sbloom.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	bfilter_t *bf = bf_setup((1 << 21), 2);
+	sbfilter_t *sbf = sbf_setup((1 << 7), 1);
 	int fd = open(argv[1], O_RDONLY);
 
 	if (fd < 0) return 1;
@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
 	memset(buf, 0, BUF_SIZE);
 	ssize_t r;
 	while((r = read(fd, buf, BUF_SIZE))) {
-		
+
 		char *c = buf;
 		char *end;
 		while (1) {
@@ -34,8 +34,8 @@ int main(int argc, char **argv) {
 
 			if (*end == '\0' ) break;
 			*end = '\0';
-			bf_add_member(c, bf);
-			assert(bf_is_member(c, bf));
+			sbf_add_member(c, sbf);
+			assert(sbf_is_member(c, sbf));
 			c = end + 1;
 		}
 
@@ -47,9 +47,7 @@ int main(int argc, char **argv) {
 		char *c = strpbrk(buf, "\n");
 		if (c) *c = '\0';
 		if (*buf == '\0') break;
-		if (!strncmp(buf, "print", 5)) {
-			bf_stat(bf);
-		} else if (bf_is_member(buf, bf)) {
+		if (sbf_is_member(buf, sbf)) {
 			printf("%s is a word\n", buf);
 		} else {
 			printf("%s is not a word\n", buf);
