@@ -18,6 +18,3 @@ sbfilter_t *sbf_setup(uint32_t initial_size, int num_hashes);
 void sbf_add_member(char *elt, sbfilter_t *sbf);
 
 char sbf_is_member(char *elt, sbfilter_t *sbf);
-
-// returns the fraction of the bloom filter that is filled
-float sbf_filled(sbfilter_t *sbf);
