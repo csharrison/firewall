@@ -2,3 +2,29 @@ bloomer
 =======
 
 A multi-threaded packet filter using bloom filters
+
+Configuration Packets: 
+one thread acts as dispatcher so lock free
+	data packet that takes in the source
+	R[D] is the set of source addresses
+only 256 at a time
+png = whether it's allowed through. just a set. buckethash. initialized to some value.
+R = hashmap. needs padding. every element of R points to a linked list/small set?
+		R stores a set of ranges of sources. need a datastructure that can store a set of ranges. needs to be amenable to adding and subtracting a range.
+need to make processes done atomically/as though they were processed serially - may need a lock to do this.
+	REMEMBER TO SHOW CORRECTNESS IN REPORT
+
+what's in config:
+-address (addr)
+-whether it is permitted to send packets(PNG)
+-Range
+-Accept
+
+need to update PNG when you get a config packet. 
+Config -> Dispatcher (which hashes the S,D to whatever number thread value it is and send it to the thread. may need to use another service to hash the config stuff which needs a lock?) will CAS PNG, take lock on R to update
+
+have to use a mutex to edit the part of R 
+
+PNG -> just malloc onto the heap with dipatcher and all threads just know about it.
+
+use readers-writers lock for R. (writer needs to wait until all the readers are off. readers won't read anything valid until writer finished)
