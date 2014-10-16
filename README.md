@@ -21,12 +21,14 @@ what's in config:
 -Accept
 
 need to update PNG when you get a config packet. 
-Config -> Dispatcher (which hashes the S,D to whatever number thread value it is and send it to the thread. may need to use another service to hash the config stuff which needs a lock?) will CAS PNG, take lock on R to update
+Config -> Dispatcher (which hashes the S,D to whatever number thread value it is and send it to the thread. may need to use another service to hash the config stuff which needs a lock?) will CAS PNG, take lock on R to update (have to use a mutex to edit the part of R )
 
-have to use a mutex to edit the part of R 
-
-PNG -> just malloc onto the heap with dipatcher and all threads just know about it.
+PNG -> just malloc onto the heap with dipatcher and all threads just know about it. (do a CAS. just make it atomic.)
 
 use readers-writers lock for R. (writer needs to wait until all the readers are off. readers won't read anything valid until writer finished)
 
-need histogram of fingerprint results (which is a way of passing along the body, so we can make sure nothing is being sent over twice. kinda like preventing pirating) we have 0-2^16 spots in the array. use getAndIncrement to keep count of how many times that fingerprint has occured. all threads will have to have access to this. 
+need histogram of fingerprint results (which is a way of passing along the body, so we can make sure nothing is being sent over twice. kinda like preventing pirating) we have 0-2^16 spots in the array. use getAndIncrement to keep count of how many times that fingerprint has occured. all threads will have to have access to this. make it so you can do get and add. make it size 2^16. 
+
+typedef our_int = size 16
+
+separate file for histogram, separate file for R, separate file for PNG
