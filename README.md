@@ -28,3 +28,5 @@ have to use a mutex to edit the part of R
 PNG -> just malloc onto the heap with dipatcher and all threads just know about it.
 
 use readers-writers lock for R. (writer needs to wait until all the readers are off. readers won't read anything valid until writer finished)
+
+need histogram of fingerprint results (which is a way of passing along the body, so we can make sure nothing is being sent over twice. kinda like preventing pirating) we have 0-2^16 spots in the array. use getAndIncrement to keep count of how many times that fingerprint has occured. all threads will have to have access to this. 
