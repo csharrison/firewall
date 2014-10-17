@@ -3,11 +3,6 @@
 
 // private methods
 pthread_rw_lock_t *_get_lock(r_t *r, addr_t addr);
-set_t *_set_setup();
-void _set_tear_down(set_t *set);
-char _set_accept(set_t *set, addr_t addr);
-void _set_add_range(set_t *set, addr_t begin, addr_t end);
-void _set_remove_range(set_t *set, addr_t beign, addr_t end);
 
 r_t *setup_r(addr_t size, int log_num_locks) {
 	r_t *r = (r_t *) malloc(sizeof(r_t));
@@ -81,28 +76,4 @@ pthread_rw_lock_t *_get_lock(r_t *r, addr_t addr) {
 	addr_t stripe_size = r->num_locks / r->size;
 	addr_t index = addr / stripe_size;
 	return r->locks[index];
-}
-
-
-/* Set */
-
-set_t *_set_setup() {
-	set_t* set = malloc(sizeof(set_t));
-	return set;
-}
-
-void _set_tear_down(set_t *set) {
-	free(set);
-}
-
-char _set_accept(set_t *set, addr_t addr) {
-	return 0;
-}
-
-void _set_add_range(set_t *set, addr_t begin, addr_t end) {
-
-}
-
-void _set_remove_range(set_t *set, addr_t beign, addr_t end) {
-
 }
