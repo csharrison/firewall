@@ -1,6 +1,4 @@
 #include "sbloom.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 level_t *_level_setup(uint32_t size, int num_hashes);
 level_t *_add_level(sbfilter_t *sbf);

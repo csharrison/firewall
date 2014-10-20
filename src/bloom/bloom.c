@@ -1,8 +1,5 @@
 #include "bloom.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
 void _set(uint32_t index, bfilter_t *bf);
 char _get(uint32_t index, bfilter_t *bf);

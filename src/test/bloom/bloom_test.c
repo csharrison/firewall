@@ -1,4 +1,4 @@
-#include "../sbloom.h"
+#include "bloom/sbloom.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
