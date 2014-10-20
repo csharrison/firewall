@@ -228,11 +228,10 @@ int _random_level() {
 	if (r < three_fourths) return 1;
 
 	int c = three_fourths;
-	int diff = RAND_MAX - c;
 	for (i = 2; i < MAX_LEVEL; i++) {
+		int diff = RAND_MAX - c;
 		if (r < c + diff/2) return i;
 		c = c + diff/2;
-		diff = RAND_MAX - c;
 	}
 	return MAX_LEVEL;
 }
