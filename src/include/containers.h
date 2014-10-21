@@ -29,12 +29,12 @@ typedef struct skip_list {
 skip_list_t *skip_list_setup();
 void skip_list_tear_down(skip_list_t *sl);
 
-char skip_list_contains(skip_list_t *sl, addr_t addr);
+int skip_list_contains(skip_list_t *sl, addr_t addr);
 
 /*
 invariant: no overlaps before and after any mutating operation
 */
-char skip_list_add_range(skip_list_t *sl, addr_t begin, addr_t end);
+int skip_list_add_range(skip_list_t *sl, addr_t begin, addr_t end);
 void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end);
 
 void skip_list_print(skip_list_t *sl);

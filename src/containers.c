@@ -49,22 +49,22 @@ void skip_list_tear_down(skip_list_t *sl) {
 	free(sl);
 }
 
-char skip_list_contains(skip_list_t *sl, addr_t addr) {
-	pthread_rwlock_rdlock(sl->lock);
+int skip_list_contains(skip_list_t *sl, addr_t addr) {
+	pthread_rwlock_rdlock(sl->rwlock);
 
 	node_t *preds[MAX_LEVEL + 1];
 	node_t *succs[MAX_LEVEL + 1];
 	int level = _find(sl, addr, addr, preds, succs, NULL);
 
-	pthread_rwlock_unlock(sl->lock);
+	pthread_rwlock_unlock(sl->rwlock);
 	if (level != -1) {
 		return 1;
 	}
 	return 0;
 }
 
-char skip_list_add_range(skip_list_t *sl, addr_t begin, addr_t end) {
-	pthread_rwlock_wrlock(sl->lock);
+int skip_list_add_range(skip_list_t *sl, addr_t begin, addr_t end) {
+	pthread_rwlock_wrlock(sl->rwlock);
 
 	node_t *preds[MAX_LEVEL + 1];
 	node_t *succs[MAX_LEVEL + 1];
@@ -104,12 +104,12 @@ char skip_list_add_range(skip_list_t *sl, addr_t begin, addr_t end) {
 	}
 	r = 1;
 unlock:
-	pthread_rwlock_unlock(sl->lock);
+	pthread_rwlock_unlock(sl->rwlock);
 	return r;
 }
 
 void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end) {
-	pthread_rwlock_wrlock(sl->lock);
+	pthread_rwlock_wrlock(sl->rwlock);
 
 	node_t *preds[MAX_LEVEL + 1];
 	node_t *succs[MAX_LEVEL + 1];
@@ -146,7 +146,7 @@ void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end) {
 		curr = next;
 	}
 
-	pthread_rwlock_unlock(sl->lock);
+	pthread_rwlock_unlock(sl->rwlock);
 }
 
 int _find(skip_list_t *sl, addr_t begin, addr_t end, node_t **preds, node_t **succs, int *overlaps) {

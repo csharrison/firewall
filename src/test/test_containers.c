@@ -20,7 +20,7 @@ int stress_test(skip_list_t *sl, int n) {
 	int i;
 	for (i = 0; i < n; i++) {
 		addr_t b = (addr_t) rand();
-		addr_t e = b + 10;
+		addr_t e = (addr_t) (b + 10);
 		skip_list_add_range(sl, b, e);
 	}
 	skip_list_print(sl);
@@ -50,7 +50,7 @@ int test_containers() {
 		addr_t b = (addr_t) ranges[i];
 		addr_t e = (addr_t) ranges[i+1];
 
-		addr_t expect = e - b;
+		addr_t expect = (addr_t)(e - b);
 		skip_list_add_range(sl, b, e);
 		skip_list_print(sl);
 		includes_range(sl, b, e, expect);
