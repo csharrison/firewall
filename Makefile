@@ -5,7 +5,7 @@ CFLAGS= -Wall -Wextra -Wconversion -Wcast-qual -Wcast-align
 CFLAGS +=   -Winline -Wfloat-equal -Wnested-externs
 CFLAGS +=   -pedantic -std=c99
 CFLAGS +=   -D_GNU_SOURCE -g
-CFLAGS += -iquotesrc/include -pthread
+CFLAGS +=   -iquotesrc/include -pthread
 
 CC = /usr/bin/gcc
 
