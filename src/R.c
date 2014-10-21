@@ -1,7 +1,7 @@
 #include "R.h"
 /* R */
 
-r_t *r_setup(addr_t size, int log_num_locks) {
+r_t *r_setup(addr_t size) {
 	r_t *r = (r_t *) malloc(sizeof(r_t));
 
 	// initialize as null
