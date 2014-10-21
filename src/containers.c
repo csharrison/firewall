@@ -5,11 +5,12 @@
 #define OUTSIDEO 4
 #define LEFTNO 5
 #define RIGHTNO 6
+#define EQUALO 7
 
 char _range_overlaps(addr_t a_s, addr_t a_e, addr_t b_s, addr_t b_e);
 void _node_tear_down(node_t *node, char free_next);
 node_t *_node_setup(addr_t begin, addr_t end, int height);
-void _link_node(node_t *node, node_t **succs, node_t *pred);
+void _link_node(node_t *node, node_t *replacing, node_t *pred);
 
 int _find(skip_list_t *sl, addr_t begin, addr_t end, node_t **preds, node_t **succs, int *overlaps);
 int _random_level() ;
@@ -109,6 +110,8 @@ unlock:
 }
 
 void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end) {
+	begin = begin > 0 ? begin : 1;
+	end = end < MAX_ADDR ? end : MAX_ADDR - 1;
 	pthread_rwlock_wrlock(sl->rwlock);
 
 	node_t *preds[MAX_LEVEL + 1];
@@ -134,9 +137,9 @@ void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end) {
 			curr->begin = fb;
 			curr->end = fe;
 
-			_link_node(new_node, curr->next, curr);
-		} else if(overlap == OUTSIDEO) {
-			_link_node(pred, curr->next, NULL);
+			_link_node(new_node, curr, curr);
+		} else if(overlap == OUTSIDEO || overlap == EQUALO) {
+			_link_node(pred, curr, NULL);
 			_node_tear_down(curr, 0);
 		} else {
 			curr->begin = end > curr->begin ?  end : curr->begin;
@@ -166,7 +169,7 @@ int _find(skip_list_t *sl, addr_t begin, addr_t end, node_t **preds, node_t **su
 			last_overlap = overlap;
 		}
 
-		if (found == -1 && last_overlap == INSIDEO) {
+		if (found == -1 && (last_overlap == INSIDEO || last_overlap == EQUALO)) {
 			found = level;
 		}
 		preds[level] = pred;
@@ -176,14 +179,17 @@ int _find(skip_list_t *sl, addr_t begin, addr_t end, node_t **preds, node_t **su
 	return found;
 }
 
-void _link_node(node_t *node, node_t **succs, node_t *pred) {
+void _link_node(node_t *node, node_t *replacing, node_t *pred) {
 	int level;
-	for(level = 0; level < node->height; level++) {
+	node_t **succs = replacing->next;
+	int copy_height = node->height < replacing->height ? node->height : replacing->height;
+	for(level = 0; level <= copy_height; level++) {
 		if (succs != NULL) {
 			node->next[level] = succs[level];
 		}
-		if(pred != NULL) {
-			// used only when we are splitting a region into 2 in remove_range
+	}
+	if (pred != NULL) {
+		for(level = 0; level <= node->height; level++) {
 			pred->next[level] = node;
 		}
 	}
@@ -212,12 +218,15 @@ void _node_tear_down(node_t *node, char free_next) {
 }
 
 char _range_overlaps(addr_t a_s, addr_t a_e, addr_t b_s, addr_t b_e) {
-	if (a_s < b_s && a_e > b_e) {
-		// CASE 1: right side of a overlaps
+	if (a_s < b_s && a_e > b_s && a_e < b_e) {
+		// CASE 1: right side of a overlaps b
 		return RIGHTO;
-	} else if(a_s < b_e && a_e > b_e) {
+	} else if(a_s > b_s && a_s < b_e && a_e > b_e) {
 		// CASE 2: left side of a overlap
 		return LEFTO;
+	} else if(a_s == b_s && a_e == b_e) {
+		// CASE 7: EQUALOOOOAUAUAOAOD
+		return EQUALO;
 	} else if(a_s >= b_s && a_e <= b_e) {
 		// CASE 3: b includes all of a
 		return INSIDEO;
@@ -238,8 +247,7 @@ char _range_overlaps(addr_t a_s, addr_t a_e, addr_t b_s, addr_t b_e) {
 int _random_level() {
 	int r = rand();
 	int i;
-	int three_fourths = 1610612735;
-	printf("%d %d\n", r, RAND_MAX);
+	int three_fourths = 1610612735; // wha huh? (3/4)*RAND_MAX
 	if (r < three_fourths) return 1;
 
 	int c = three_fourths;

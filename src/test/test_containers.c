@@ -55,7 +55,17 @@ int test_containers() {
 		skip_list_print(sl);
 		includes_range(sl, b, e, expect);
 	}
-	stress_test(sl, 100);
+
+	skip_list_remove_range(sl, 1, 7);
+	skip_list_print(sl);
+	skip_list_remove_range(sl, 75, 150);
+	skip_list_print(sl);
+	skip_list_remove_range(sl, 1, 250);
+	skip_list_print(sl);
+	skip_list_remove_range(sl, 0, MAX_ADDR);
+	printf("killed all\n");
+	skip_list_print(sl);
+	//stress_test(sl, 100);
 	skip_list_tear_down(sl);
 	return 0;
 }
