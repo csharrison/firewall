@@ -16,12 +16,26 @@ int includes_range(skip_list_t *sl, addr_t begin, addr_t end, addr_t expected) {
 	return count;
 }
 
-int stress_test(skip_list_t *sl, int n) {
+void *add_tons(void *vsl) {
+	skip_list_t *sl = (skip_list_t *)vsl;
 	int i;
-	for (i = 0; i < n; i++) {
+	for (i = 0; i < 100; i++) {
 		addr_t b = (addr_t) rand();
 		addr_t e = (addr_t) (b + 10);
-		skip_list_add_range(sl, b, e);
+		// protect overflows
+		if (b < e) skip_list_add_range(sl, b, e);
+	}
+	return NULL;
+}
+
+int stress_test(skip_list_t *sl, int n) {
+	pthread_t threads[n];
+	int t;
+	for (t = 0; t < n; t++) {
+		pthread_create(&threads[t], NULL, add_tons, (void *)sl);
+	}
+	for (t = 0; t < n; t++) {
+		pthread_join(threads[t], NULL);
 	}
 	skip_list_print(sl);
 	return 0;
@@ -65,7 +79,9 @@ int test_containers() {
 	skip_list_remove_range(sl, 0, MAX_ADDR);
 	printf("killed all\n");
 	skip_list_print(sl);
-	//stress_test(sl, 100);
+	stress_test(sl, 200);
+	skip_list_remove_range(sl, 0, MAX_ADDR);
+	skip_list_print(sl);
 	skip_list_tear_down(sl);
 	return 0;
 }

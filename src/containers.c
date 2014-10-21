@@ -63,6 +63,8 @@ int skip_list_contains(skip_list_t *sl, addr_t addr) {
 }
 
 int skip_list_add_range(skip_list_t *sl, addr_t begin, addr_t end) {
+	begin = MAX(1, begin);
+	end = MIN(end, MAX_ADDR - 1);
 	pthread_rwlock_wrlock(sl->rwlock);
 
 	node_t *preds[MAX_LEVEL];
