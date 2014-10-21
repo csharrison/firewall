@@ -5,14 +5,17 @@ r_t *r_setup(addr_t size) {
 	r_t *r = (r_t *) malloc(sizeof(r_t));
 
 	// initialize as null
-	skip_list_t **dests = (skip_list_t **) malloc(size * sizeof(skip_list_t *));
-	memset(dest, NULL, size * sizeof(skip_list_t *));
+	atomic_ref *dests = (atomic_ref *) malloc(size * sizeof(atomic_ref));
+	int i;
+	for (i = 0; i < size; i++) {
+		atomic_init(dests + i, NULL);
+	}
 
 	r->dests = dests;
 	r->size = size;
 
 	if (r == NULL || dests == NULL) {
-		perror('malloc');
+		perror("malloc");
 	}
 
 	return r;
@@ -21,35 +24,42 @@ r_t *r_setup(addr_t size) {
 void r_tear_down(r_t *r) {
 	int i;
 	for (i = 0 ; i < r->size; i++) {
-		if (r->dests[i] != NULL) {
-			skip_list_tear_down(r->dests[i]);
+		atomic_ref *set_ref = r->dests + i;
+		skip_list_t *sl = (skip_list_t *)atomic_load(set_ref);
+		if (sl != NULL) {
+			skip_list_tear_down(sl);
 		}
 	}
 	free(r->dests);
 	free(r);
 }
 
-char r_accept(r_t *r, addr_t dest, addr_t src) {
-	skip_list_t *set = r->dests[dest];
+int r_accept(r_t *r, addr_t dest, addr_t src) {
+	atomic_ref *set_ref = r->dests + dest;
+	skip_list_t *sl = (skip_list_t *)atomic_load(set_ref);
 
-	if (set == NULL) {
+	if (sl == NULL) {
 		return 0;
 	}
-
-	return skip_list_contains(set, src);
+	return skip_list_contains(sl, src);
 }
 
 void r_update(r_t *r, char to_add, addr_t dest, addr_t begin, addr_t end) {
-	skip_list_t *set = r->dests[dest];
-
-	if (set == NULL) {
-		set = skip_list_setup();
-		r->dests[dest] = set;
+	atomic_ref *set_ref = r->dests + dest;
+	skip_list_t *sl = (skip_list_t *)atomic_load(set_ref);
+	if (sl == NULL) {
+		sl = skip_list_setup();
+		atomic_ref val = NULL;
+		char ace = atomic_compare_exchange_strong(set_ref, &val, sl);
+		if(! ace) {
+			skip_list_tear_down(sl);
+			sl = (skip_list_t *)atomic_load(set_ref);
+		}
 	}
 
 	if (to_add) {
-		skip_list_add_range(set, begin, end);
+		skip_list_add_range(sl, begin, end);
 	} else {
-		skip_list_remove_range(set, begin, end);
+		skip_list_remove_range(sl, begin, end);
 	}
 }

@@ -1,3 +1,6 @@
+#ifndef CONTAINERS_H
+#define CONTAINERS_H
+
 #include <stdint.h>
 #include <time.h>
 #include <stdlib.h>
@@ -38,3 +41,5 @@ int skip_list_add_range(skip_list_t *sl, addr_t begin, addr_t end);
 void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end);
 
 void skip_list_print(skip_list_t *sl);
+
+#endif
