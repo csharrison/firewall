@@ -6,7 +6,7 @@ r_t *r_setup(addr_t size, int log_num_locks) {
 
 	// initialize as null
 	skip_list_t **dests = (skip_list_t **) malloc(size * sizeof(skip_list_t *));
-	memset(dest, 0, size * sizeof(skip_list_t *));
+	memset(dest, NULL, size * sizeof(skip_list_t *));
 
 	r->dests = dests;
 	r->size = size;
@@ -31,11 +31,22 @@ void r_tear_down(r_t *r) {
 
 char r_accept(r_t *r, addr_t dest, addr_t src) {
 	skip_list_t *set = r->dests[dest];
+
+	if (set == NULL) {
+		return 0;
+	}
+
 	return skip_list_contains(set, src);
 }
 
 void r_update(r_t *r, char to_add, addr_t dest, addr_t begin, addr_t end) {
 	skip_list_t *set = r->dests[dest];
+
+	if (set == NULL) {
+		set = skip_list_setup();
+		r->dests[dest] = set;
+	}
+
 	if (to_add) {
 		skip_list_add_range(set, begin, end);
 	} else {
