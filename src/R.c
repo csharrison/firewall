@@ -50,8 +50,7 @@ void r_update(r_t *r, char to_add, addr_t dest, addr_t begin, addr_t end) {
 	if (sl == NULL) {
 		sl = skip_list_setup();
 		atomic_ref val = NULL;
-		char ace = atomic_compare_exchange_strong(set_ref, &val, sl);
-		if(! ace) {
+		if(! atomic_compare_exchange_strong(set_ref, &val, sl)) {
 			skip_list_tear_down(sl);
 			sl = (skip_list_t *)atomic_load(set_ref);
 		}
