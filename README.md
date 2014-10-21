@@ -1,7 +1,7 @@
-bloomer
+firewall
 =======
 
-A multi-threaded packet filter using bloom filters
+A multi-threaded packet filter
 
 Configuration Packets: 
 one thread acts as dispatcher so lock free
