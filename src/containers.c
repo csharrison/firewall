@@ -220,17 +220,18 @@ char _range_overlaps(addr_t a_s, addr_t a_e, addr_t b_s, addr_t b_e) {
 	} else if(a_s >= b_s && a_e <= b_e) {
 		// CASE 3: b includes all of a
 		return INSIDEO;
-	} else if(a_s < b_s && a_e > b_e) {
+	} else if(a_s <= b_s && a_e >= b_e) {
 		// CASE 4: a includes all of b
 		return OUTSIDEO;
-	} else if(a_e < b_s) {
+	} else if(a_e <= b_s) {
 		// CASE 5: a left of b
 		return LEFTNO;
-	} else if(a_s > b_e) {
+	} else if(a_s >= b_e) {
 		// CASE 6: a right of b
 		return RIGHTNO;
 	}
-	assert("should take care of all cases");
+	printf("a = (%u %u) b = (%u %u)\n", a_s, a_e, b_s, b_e);
+	assert(1 == 0 && "should take care of all cases");
 	return 0;
 }
 
