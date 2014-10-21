@@ -65,8 +65,8 @@ int skip_list_contains(skip_list_t *sl, addr_t addr) {
 int skip_list_add_range(skip_list_t *sl, addr_t begin, addr_t end) {
 	pthread_rwlock_wrlock(sl->rwlock);
 
-	node_t *preds[MAX_LEVEL + 1];
-	node_t *succs[MAX_LEVEL + 1];
+	node_t *preds[MAX_LEVEL];
+	node_t *succs[MAX_LEVEL];
 
 	int top_level = _random_level();
 	int r = 0;
@@ -99,9 +99,9 @@ void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end) {
 	end = MIN(end, MAX_ADDR - 1);
 	pthread_rwlock_wrlock(sl->rwlock);
 
-	node_t *preds[MAX_LEVEL + 1];
-	node_t *succs[MAX_LEVEL + 1];
-	int overlaps[MAX_LEVEL + 1];
+	node_t *preds[MAX_LEVEL];
+	node_t *succs[MAX_LEVEL];
+	int overlaps[MAX_LEVEL];
 
 	_find(sl, begin, end, preds, succs, overlaps);
 
@@ -114,7 +114,7 @@ void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end) {
 		if (overlap == INSIDEO) {
 			// new nodes (curr->begin, begin) and (end, curr->end)
 			curr->end = begin;
-			node_t *new_node = _node_setup(end, curr->end, curr->height);
+			node_t *new_node = _node_setup(end, curr->end, _random_level_at_most(curr->height));
 			_link_node(new_node, curr, curr);
 		} else if(overlap == OUTSIDEO || overlap == EQUALO) {
 			// totally destroy it
@@ -135,7 +135,7 @@ int _find(skip_list_t *sl, addr_t begin, addr_t end, node_t **preds, node_t **su
 	int found = -1;
 	node_t *pred = sl->head;
 	int level;
-	for(level = MAX_LEVEL; level >= 0; level--) {
+	for(level = MAX_LEVEL - 1; level >= 0; level--) {
 		node_t *cur = pred->next[level];
 		assert(cur != NULL);
 		int overlap;
@@ -162,13 +162,13 @@ void _link_node(node_t *node, node_t *replacing, node_t *pred) {
 	int level;
 	node_t **succs = replacing->next;
 	int copy_height = MIN(node->height, replacing->height);
-	for(level = 0; level <= copy_height; level++) {
+	for(level = 0; level < copy_height; level++) {
 		if (succs != NULL) {
 			node->next[level] = succs[level];
 		}
 	}
 	if (pred != NULL) {
-		for(level = 0; level <= node->height; level++) {
+		for(level = 0; level < node->height; level++) {
 			pred->next[level] = node;
 		}
 	}
@@ -176,7 +176,7 @@ void _link_node(node_t *node, node_t *replacing, node_t *pred) {
 
 void _link_from_arrs(node_t *node, node_t **preds, node_t **succs) {
 	int level;
-	for (level = 0; level <= node->height; level++) {
+	for (level = 0; level < node->height; level++) {
 		preds[level]->next[level] = node;
 		node->next[level] = succs[level];
 	}
@@ -244,7 +244,7 @@ int _random_level() {
 		if (r < c + diff/2) return i;
 		c = c + diff/2;
 	}
-	return MAX_LEVEL;
+	return MAX_LEVEL - 1;
 }
 
 int _random_level_at_most(int l) {
