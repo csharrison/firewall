@@ -1,4 +1,4 @@
-TEXEC = test
+TEXEC = build/test
 TSRC = src/test/*.c src/containers.c src/R.c
 
 CFLAGS= -Wall -Wextra -Wconversion -Wcast-qual -Wcast-align
@@ -8,8 +8,6 @@ CFLAGS +=   -D_GNU_SOURCE -g
 CFLAGS +=   -iquotesrc/include -pthread
 
 CC = /usr/bin/gcc-4.9
-
-.PHONY: all test clean
 
 test:
 	$(CC) $(CFLAGS) -o $(TEXEC) $(TSRC)
