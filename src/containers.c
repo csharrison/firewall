@@ -12,17 +12,20 @@
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
 
 char _range_overlaps(addr_t a_s, addr_t a_e, addr_t b_s, addr_t b_e);
-void _node_tear_down(node_t *node, char free_next);
+void _node_tear_down(node_t *node);
 node_t *_node_setup(addr_t begin, addr_t end, int height);
+
 void _link_node(node_t *node, node_t *replacing, node_t *pred);
 void _link_from_arrs(node_t *node, node_t **preds, node_t **succs);
+void _link_over_node(node_t *node, node_t **preds);
+
 int _find(skip_list_t *sl, addr_t begin, addr_t end, node_t **preds, node_t **succs, int *overlaps);
 int _random_level() ;
 int _random_level_at_most(int l);
 
 skip_list_t *skip_list_setup() {
 	// seed the random number generator
-	srand((unsigned int) time(NULL));
+	//srand((unsigned int) 1/*time(NULL*/);
 	skip_list_t *sl = malloc(sizeof(skip_list_t));
 	node_t *tail = _node_setup(MAX_ADDR, MAX_ADDR, 0);
 	node_t *head = _node_setup(0, 0, MAX_LEVEL + 1);
@@ -47,10 +50,10 @@ void skip_list_tear_down(skip_list_t *sl) {
 	node_t *cur = sl->head;
 	while(cur != sl->tail) {
 		node_t *next = cur->next[0];
-		_node_tear_down(cur, 1);
+		_node_tear_down(cur);
 		cur = next;
 	}
-	_node_tear_down(sl->tail, 1);
+	_node_tear_down(sl->tail);
 	pthread_rwlock_destroy(sl->rwlock);
 	free(sl);
 }
@@ -84,7 +87,7 @@ int skip_list_add_range(skip_list_t *sl, addr_t begin, addr_t end) {
 		tb = MIN(tb, n->begin);
 		te = MAX(te, n->end);
 		height = MAX(height, n->height);
-		_node_tear_down(n, 1);
+		_node_tear_down(n);
 		n = next;
 	}
 	node_t *new_node = _node_setup(tb, te, height);
@@ -107,27 +110,28 @@ void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end) {
 
 	_find(sl, begin, end, preds, succs, overlaps);
 
-	node_t *pred = preds[0];
-	node_t *curr = pred->next[0];
+	node_t *curr = preds[0]->next[0];
 	node_t *succ = succs[0];
 	while(curr != succ) {
+		assert(curr != sl->head);
 		node_t *next = curr->next[0];
 		int overlap = _range_overlaps(begin, end, curr->begin, curr->end);
 		if (overlap == INSIDEO) {
 			// new nodes (curr->begin, begin) and (end, curr->end)
+			node_t *new_node = _node_setup(end, curr->end, curr->height/*_random_level_at_most(curr->height)*/);
 			curr->end = begin;
-			node_t *new_node = _node_setup(end, curr->end, _random_level_at_most(curr->height));
 			_link_node(new_node, curr, curr);
+			assert(succ == next);
 		} else if(overlap == OUTSIDEO || overlap == EQUALO) {
 			// totally destroy it
-			_link_node(pred, curr, NULL);
-			_node_tear_down(curr, 0);
-		} else {
-			// shrink it
-			curr->begin = MAX(curr->begin, end);
-			curr->end = MIN(curr->end, begin);
-			pred = curr;
-		}
+			_link_over_node(curr, preds);
+			_node_tear_down(curr);
+		} else if (overlap == RIGHTO) {
+			curr->begin = end;
+			assert(next == succ);
+		} else if (overlap == LEFTO)  {
+			curr->end = begin;
+		} else assert(1 == 0 && "should not be overlapped");
 		curr = next;
 	}
 	pthread_rwlock_unlock(sl->rwlock);
@@ -140,6 +144,7 @@ int _find(skip_list_t *sl, addr_t begin, addr_t end, node_t **preds, node_t **su
 	for(level = MAX_LEVEL - 1; level >= 0; level--) {
 		node_t *cur = pred->next[level];
 		assert(cur != NULL);
+		assert(cur->begin > 0);
 		int overlap;
 		int last_overlap = 0;
 		while((overlap = _range_overlaps(begin, end, cur->begin, cur->end)) != LEFTNO) {
@@ -162,16 +167,24 @@ int _find(skip_list_t *sl, addr_t begin, addr_t end, node_t **preds, node_t **su
 
 void _link_node(node_t *node, node_t *replacing, node_t *pred) {
 	int level;
-	node_t **succs = replacing->next;
-	int copy_height = MIN(node->height, replacing->height);
-	for(level = 0; level < copy_height; level++) {
-		if (succs != NULL) {
-			node->next[level] = succs[level];
+	assert(node->height >= replacing->height);
+	for(level = 0; level < replacing->height; level++) {
+		if (replacing->next != NULL) {
+			node->next[level] = replacing->next[level];
 		}
 	}
 	if (pred != NULL) {
 		for(level = 0; level < node->height; level++) {
+			assert(pred->height >= level);
 			pred->next[level] = node;
+		}
+	}
+}
+
+void _link_over_node(node_t *node, node_t **preds) {
+	for (int l = 0; l < node->height; l++) {
+		if (preds[l]->next[l] == node) {
+			preds[l]->next[l] = node->next[l];
 		}
 	}
 }
@@ -191,8 +204,8 @@ node_t *_node_setup(addr_t begin, addr_t end, int height) {
 
 	node_t **next = NULL;
 	if (height > 0) {
-		next = malloc(sizeof(node_t *) * (unsigned int)(height + 1));
-		memset(next, 0, sizeof(node_t *) * (unsigned int)(height + 1));
+		next = malloc(sizeof(node_t *) * (unsigned int)(height));
+		memset(next, 0, sizeof(node_t *) * (unsigned int)(height));
 	}
 	assert(height == 0 || next != NULL);
 
@@ -201,34 +214,30 @@ node_t *_node_setup(addr_t begin, addr_t end, int height) {
 	return node;
 }
 
-void _node_tear_down(node_t *node, char free_next) {
-	// TODO: maybe memory leak if free_next false
-	if (free_next) free(node->next);
+void _node_tear_down(node_t *node) {
+	free(node->next);
 	free(node);
 }
 
 char _range_overlaps(addr_t a_s, addr_t a_e, addr_t b_s, addr_t b_e) {
-	if (a_s < b_s && a_e > b_s && a_e < b_e) {
+	if (a_s >= b_e) {
+		return RIGHTNO;
+	} else if(a_e <= b_s) {
+		return LEFTNO;
+	} else if(a_s == b_s && a_e == b_e) {
+		return EQUALO;
+	} else if (a_s < b_s && a_e > b_s && a_e < b_e) {
 		// CASE 1: right side of a overlaps b
 		return RIGHTO;
 	} else if(a_s > b_s && a_s < b_e && a_e > b_e) {
 		// CASE 2: left side of a overlap
 		return LEFTO;
-	} else if(a_s == b_s && a_e == b_e) {
-		// CASE 7: EQUALOOOOAUAUAOAOD
-		return EQUALO;
-	} else if(a_s >= b_s && a_e <= b_e) {
+	}  else if(a_s >= b_s && a_e <= b_e) {
 		// CASE 3: b includes all of a
 		return INSIDEO;
 	} else if(a_s <= b_s && a_e >= b_e) {
 		// CASE 4: a includes all of b
 		return OUTSIDEO;
-	} else if(a_e <= b_s) {
-		// CASE 5: a left of b
-		return LEFTNO;
-	} else if(a_s >= b_e) {
-		// CASE 6: a right of b
-		return RIGHTNO;
 	}
 	printf("a = (%u %u) b = (%u %u)\n", a_s, a_e, b_s, b_e);
 	assert(1 == 0 && "should take care of all cases");
