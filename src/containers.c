@@ -265,17 +265,53 @@ int _random_level_at_most(int l) {
 }
 
 void skip_list_print(skip_list_t *sl) {
+	addr_t count = 0;
 	node_t *curr = sl->head;
-
 	while(1) {
-		printf("(%5u, %5u):", curr->begin, curr->end);
+		count++;
+		if (curr == sl->tail) break;
+		curr = curr->next[0];
+	}
+	node_t **base = malloc(sizeof(node_t *) * count);
+	int i = 0;
+	curr = sl->head;
+	while(1) {
+		base[i] = curr;
+		if (curr == sl->tail) break;
+		curr = curr->next[0];
+		i++;
+	}
+
+	curr = sl->head;
+	int c = 0;
+	while(1) {
+		printf("%3u (%5u,%5u):", c, curr->begin, curr->end);
+		if(curr->begin >= curr->end) {
+			assert(curr == sl->head || curr == sl->tail);
+			assert(curr->begin == curr->end);
+		}
 		int level;
+
 		for(level = 0; level < curr->height; level++) {
-			printf("#");
+			node_t *bottom_next = curr->next[0];
+			node_t *l = curr->next[level];
+			if (bottom_next->height > level) {
+				assert(l == bottom_next);
+			}
+			char found = 0;
+			for(i = 0; i < count; i++) {
+				if(base[i] == l) {
+					printf("%3d|", i);
+					found = 1;
+				}
+			}
+			assert(found);
 		}
 		printf("\n");
 		if (curr == sl->tail) break;
 		curr = curr->next[0];
+		c++;
 	}
 	printf("\n");
+	free(base);
 }
