@@ -79,7 +79,11 @@ int test_containers() {
 	skip_list_remove_range(sl, 0, MAX_ADDR);
 	printf("killed all\n");
 	skip_list_print(sl);
-	stress_test(sl, 200);
+	stress_test(sl, 1);
+	for (i = 1; i < 100; i++) {
+		skip_list_remove_range(sl, i*10, i*50);
+	}
+	skip_list_print(sl);
 	skip_list_remove_range(sl, 0, MAX_ADDR);
 	skip_list_print(sl);
 	skip_list_tear_down(sl);
