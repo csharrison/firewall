@@ -1,5 +1,5 @@
 TEXEC = build/test
-TSRC = src/test/*.c src/containers.c src/R.c
+TSRC = src/test/*.c src/collections/skip_list.c src/collections/R.c
 
 CFLAGS= -Wall -Wextra -Wconversion -Wcast-qual -Wcast-align
 CFLAGS +=   -Winline -Wfloat-equal -Wnested-externs
