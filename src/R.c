@@ -34,10 +34,12 @@ void r_tear_down(r_t *r) {
 	free(r);
 }
 
-int r_accept(r_t *r, addr_t dest, addr_t src) {
-	atomic_ref *set_ref = r->dests + dest;
-	skip_list_t *sl = (skip_list_t *)atomic_load(set_ref);
+skip_list_t *_get_skip_list(r_t *r, addr_t i) {
+	return (skip_list_t *)atomic_load(r->dests + i);
+}
 
+int r_accept(r_t *r, addr_t dest, addr_t src) {
+	skip_list_t *sl = _get_skip_list(r, dest);
 	if (sl == NULL) {
 		return 0;
 	}
@@ -45,14 +47,13 @@ int r_accept(r_t *r, addr_t dest, addr_t src) {
 }
 
 void r_update(r_t *r, char to_add, addr_t dest, addr_t begin, addr_t end) {
-	atomic_ref *set_ref = r->dests + dest;
-	skip_list_t *sl = (skip_list_t *)atomic_load(set_ref);
+	skip_list_t *sl = _get_skip_list(r, dest);
 	if (sl == NULL) {
 		sl = skip_list_setup();
 		atomic_ref val = NULL;
-		if(! atomic_compare_exchange_strong(set_ref, &val, sl)) {
+		if(! atomic_compare_exchange_strong(r->dests + dest, &val, sl)) {
 			skip_list_tear_down(sl);
-			sl = (skip_list_t *)atomic_load(set_ref);
+			sl = _get_skip_list(r, dest);
 		}
 	}
 
