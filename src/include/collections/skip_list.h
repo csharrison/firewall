@@ -10,7 +10,6 @@
 #include <assert.h>
 
 #define MAX_LEVEL 16
-#define MAX_ADDR ((addr_t) ~0)
 
 typedef struct node {
 	addr_t begin;
