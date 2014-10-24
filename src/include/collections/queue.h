@@ -8,11 +8,6 @@ struct squeue {
 	int tail;
 	int size;
 	void **buff;
-
-	// condition variable for broadcasting
-	// on the waiting dequeuer
-	pthread_cond_t empty_cv;
-	pthread_mutex_t empty_m;
 } squeue_t;
 
 squeue_t *squeue_setup(int size);
