@@ -2,7 +2,7 @@
 #include "collections/PNG.h"
 #include "collections/R.h"
 #include "packet_gen/packet_gen.h"
-typedef struct worker_info {
+typedef struct writer_info {
 	squeue_t *queue;
 
 	png_t *png;
@@ -10,6 +10,6 @@ typedef struct worker_info {
 	r_t *r;
 
 	hist_c *hist;
-} worker_info_t;
+} writer_info_t;
 
-void *worker_start(void *wi);
+void *writer_start(void *wi);
