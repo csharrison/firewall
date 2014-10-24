@@ -1,6 +1,6 @@
 #ifndef CONTAINERS_H
 #define CONTAINERS_H
-
+#include "types.h"
 #include <stdint.h>
 #include <time.h>
 #include <stdlib.h>
@@ -8,11 +8,9 @@
 #include <string.h>
 #include <pthread.h>
 #include <assert.h>
-typedef uint16_t addr_t;
 
 #define MAX_LEVEL 16
 #define MAX_ADDR ((addr_t) ~0)
-
 
 typedef struct node {
 	addr_t begin;
