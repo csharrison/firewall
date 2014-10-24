@@ -31,7 +31,7 @@ typedef struct config_packet {
     // this boolean specifies whether the range of source addresses [address_begin, address_end)
     // should be accepted (true) or rejected (false) by destination address <address>,
     // overriding any previous permissions o that range of source addresses
-    char acception_range;
+    char accepting_range;
 
     // the update is applied to this address
     addr_t address;
