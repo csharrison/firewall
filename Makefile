@@ -7,7 +7,7 @@ CFLAGS +=   -pedantic -std=c11
 CFLAGS +=   -D_GNU_SOURCE -g
 CFLAGS +=   -iquotesrc/include -pthread
 
-CC = /usr/bin/gcc-4.9
+CC = gcc-4.9
 
 test:
 	$(CC) $(CFLAGS) -o $(TEXEC) $(TSRC)
