@@ -1,7 +1,6 @@
-#include <math.h>
-#define HISTOGRAM_SIZE 16
+#include "types.h"
 
 typedef struct histogram {
-    int hist[pow(2,HISTOGRAM_SIZE)] = {0};
+    int hist[1<<MAX_ADDR] = {0};
 
 } histogram_t;
