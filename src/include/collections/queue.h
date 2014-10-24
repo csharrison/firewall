@@ -15,5 +15,5 @@ void squeue_tear_down(squeue_t *q);
 void squeue_enq(squeue_t *q, void *x);
 void *squeue_deq();
 
-// waits on a condition variable
+// waits
 void *squeue_deq_wait(squeue_t *q);
