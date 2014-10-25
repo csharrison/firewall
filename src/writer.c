@@ -2,7 +2,19 @@
 
 void _process_cpacket(worker_info_t *w, cpacket_t *packet);
 
-void *worker_start(void *wi) {
+worker_info_t *writer_setup(squeue_t *queue, png_t *png, r_t *r) {
+	worker_info_t *w = malloc(sizeof(worker_info_t));
+	w->queue = queue;
+	w->png = png;
+	w->r = r;
+	return w;
+}
+
+void writer_tear_down(worker_info_t *w) {
+	free(w);
+}
+
+void *writer_start(void *wi) {
 	worker_info_t *w = (worker_info_t *)wi;
 
 	while (1) {
