@@ -7,7 +7,7 @@ hist_t *hist_setup(){
 
 	// initialize as null
         
-	atomic_int dest[1<<MAX_ADDR] = {0};
+	atomic_long dest[1<<MAX_ADDR] = {0};
 
         hist->dest = dest;
 
