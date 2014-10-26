@@ -3,7 +3,7 @@
 /*histogram*/
 
 typedef struct h {
-    atomic_int dest[1<<MAX_ADDR];
+    atomic_long dest[1<<MAX_ADDR];
 
 } h_t;
 
