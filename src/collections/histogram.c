@@ -2,17 +2,27 @@
 #include "stdatomic.h"
 /*histogram*/
 
-typedef struct h {
-    atomic_int hist[1<<MAX_ADDR] = {0};
+hist_t *hist_setup(){
+        hist_t *hist = (hist_t *) malloc(sizeof(hist_t));
 
-} h_t;
+	// initialize as null
+        
+	atomic_int dest[1<<MAX_ADDR] = {0};
 
-//get
-int histogram_get(h_t *h, int addr){
-        return (int)atomic_load(h->hist[addr]);
+        hist->dest = dest;
+
+        if (hist== NULL){
+                perror("malloc");
+        }
+
+	return hist;
+
 }
 
-//getAndIncrement
-void histogram_getAndIncrement(h_t *h, int addr){
-        atomic_fetch_add(h->hist[addr],1);     
+void hist_tear_down(hist_t *hist){
+        free(hist);
+}
+
+void hist_update(hist_t *hist, uint16_t fingerprint){
+        atomic_fetch_add(h->hist[fingerprint], 1);
 }
