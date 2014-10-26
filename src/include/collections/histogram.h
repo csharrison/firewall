@@ -1,2 +1,14 @@
 #include "types.h"
-void hist_add(hist_c *h, addr_t addr);
+#include "stdatomic.h"
+/*histogram*/
+
+typedef struct h {
+    atomic_int dest[1<<MAX_ADDR];
+
+} h_t;
+
+hist_t *hist_setup();
+
+void hist_tear_down(hist_t *hist);
+
+void hist_update(hist_t *hist, uint16_t fingerprint);
