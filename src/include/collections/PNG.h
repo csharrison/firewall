@@ -3,10 +3,8 @@
 #include "stdatomic.h"
 /*PNG*/
 typedef struct png {
-        atomic_char dest[1<<MAX_ADDR];
+        atomic_char dest[MAX_ADDR];
 } png_t;
-
-typedef atomic_intptr_t atomic_ref;
 
 png_t *png_setup();
 

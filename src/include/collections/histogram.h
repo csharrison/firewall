@@ -2,10 +2,10 @@
 #include "stdatomic.h"
 /*histogram*/
 
-typedef struct h {
-    atomic_long dest[1<<MAX_ADDR];
+typedef struct hist {
+    atomic_long dest[MAX_ADDR];
 
-} h_t;
+} hist_t;
 
 hist_t *hist_setup();
 
