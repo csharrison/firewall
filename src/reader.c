@@ -29,7 +29,7 @@ void *reader_start(void *wi) {
 void _process_dpacket(reader_info_t *w, dpacket_t *packet) {
 	if (png_allow(w->png, packet->src) &&
 		r_accept(w->r, packet->dest, packet->src)) {
-		hist_add(w->hist, _fingerprint(packet));
+		hist_update(w->hist, _fingerprint(packet));
 	}
 }
 

@@ -4,7 +4,7 @@
 
 typedef struct data_packet {
     // PAYLOAD
-    long interations;
+    long iterations;
     long seed;
 
     // HEADER

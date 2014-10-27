@@ -1,5 +1,5 @@
 FEXEC = build/firewall
-FSRC = src/collections/*.c src/random/* src/*.c
+FSRC = src/collections/*.c src/packet/*  src/random/* src/*.c -lm
 TEXEC = build/test
 TSRC = src/test/*.c src/collections/skip_list.c src/collections/R.c
 

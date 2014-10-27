@@ -1,5 +1,7 @@
 #include "packet/packet.h"
-
+#include "random/random_generator.h"
+#include <stdlib.h>
+#include <assert.h>
 /* private stuff */
 typedef struct train {
     addr_t src;
@@ -16,11 +18,20 @@ typedef struct train {
 
 
 typedef struct pgen {
+	int mean_comms_per_address;
+	double mean_window;
+	double src_residue;
+	double dest_residue;
+	double speed;
+	double exp_mean;
+	addr_t src_seed;
+	addr_t dest_seed;
+
     // log2(#addresses)
-    uint32_t num_addresses_log;
+    int num_addresses_log;
 
     // log2(#num active packet trains)
-    uint32_t num_trains_log;
+    int num_trains_log;
 
     // avg # of packets in a train
     double mean_train_size;
@@ -45,8 +56,10 @@ typedef struct pgen {
     int num_config_packets;
     int config_address_mask;
     train_t *trains;
+
+    addr_t last_config_address;
 } pgen_t;
 
 pgen_t *setup_packet_gen();
 void tear_down_packet_gen(pgen_t *);
-uint32_t get_packet(pgen_t *pgen, dpacket_t **data_packet, cpacket_t **config_packet);
+int get_packet(pgen_t *pgen, dpacket_t **data_packet, cpacket_t **config_packet);
