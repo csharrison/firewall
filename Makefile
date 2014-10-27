@@ -1,3 +1,5 @@
+FEXEC = build/firewall
+FSRC = src/collections/*.c src/packet/*  src/random/* src/*.c
 TEXEC = build/test
 TSRC = src/test/*.c src/collections/skip_list.c src/collections/R.c
 
@@ -8,6 +10,9 @@ CFLAGS +=   -D_GNU_SOURCE -g
 CFLAGS +=   -iquotesrc/include -pthread
 
 CC = gcc-4.9
+
+firewall:
+	$(CC) $(CFLAGS) -o $(FEXEC) $(FSRC)
 
 test:
 	$(CC) $(CFLAGS) -o $(TEXEC) $(TSRC)
