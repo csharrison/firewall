@@ -8,15 +8,15 @@ r_t *r_setup(addr_t size) {
 	atomic_ref *dests = (atomic_ref *) malloc(size * sizeof(atomic_ref));
 	int i;
 	for (i = 0; i < size; i++) {
-                atomic_init(dest + i, NULL);
+		atomic_init(dests + i, NULL);
 	}
 
-        r->dests = dests;
-        r->size = size;
+	r->dests = dests;
+	r->size = size;
 
-        if (r == NULL || dests == NULL){
-                perror("malloc");
-        }
+	if (r == NULL || dests == NULL){
+		perror("malloc");
+	}
 
 	return r;
 }
