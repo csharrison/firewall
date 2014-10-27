@@ -1,9 +1,11 @@
-#include
+#include <pthread.h>
+#include <stdlib.h>
+#include <assert.h>
 /*
 	A simple wait-free single enqueuer - single dequeuer queue
 	note: this cannot store more than `size` elements
 */
-struct squeue {
+typedef struct squeue {
 	int head;
 	int tail;
 	int size;

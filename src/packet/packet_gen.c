@@ -133,6 +133,6 @@ void _setup_train(pgen_t *pgen, train_t *train) {
 	train->total_trains = rng_exp(pgen->mean_trains_per_comm);
 	train->mean_work = rng_exp(png->mean_work);
 	train->tag = rng_rand();
-	trian->sequence_number = 0;
+	train->sequence_number = 0;
 	train->train_number = 0;
 }

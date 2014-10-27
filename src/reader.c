@@ -27,13 +27,13 @@ void *reader_start(void *wi) {
 }
 
 void _process_dpacket(reader_info_t *w, dpacket_t *packet) {
-	if (png_allow(w->png, packet->source) &&
-		r_accept(w->r, packet->dest, packet->source)) {
-		hist_add(w->hist, fingerprint(packet));
+	if (png_allow(w->png, packet->src) &&
+		r_accept(w->r, packet->dest, packet->src)) {
+		hist_add(w->hist, _fingerprint(packet));
 	}
 }
 
 uint16_t _fingerprint(dpacket_t *packet) {
 	// TODO: fingerprint
-	return packet->source;
+	return packet->src;
 }

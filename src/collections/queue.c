@@ -2,7 +2,7 @@
 
 squeue_t *squeue_setup(int size) {
 	squeue_t *q = malloc(sizeof(squeue_t));
-	void **buff = malloc(sizeof(void *) * size);
+	void **buff = malloc(sizeof(void *) * (unsigned int)size);
 
 	q->head = 0;
 	q->tail = 0;

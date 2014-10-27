@@ -1,7 +1,7 @@
 #include "collections/queue.h"
 #include "collections/PNG.h"
 #include "collections/R.h"
-#include "packet_gen/packet_gen.h"
+#include "packet/packet_gen.h"
 
 typedef struct reader_info {
 	squeue_t *queue;
