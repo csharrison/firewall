@@ -2,7 +2,7 @@
 /* R*/
 
 r_t *r_setup(addr_t size) {
-	r_t *h = (r_t *) malloc(sizeof(r_t));
+	r_t *r = (r_t *) malloc(sizeof(r_t));
 
 	// initialize as null
 	atomic_ref *dests = (atomic_ref *) malloc(size * sizeof(atomic_ref));
