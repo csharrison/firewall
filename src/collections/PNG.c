@@ -23,11 +23,11 @@ void png_tear_down(png_t *png) {
 }
 
 int png_allow(png_t *png, addr_t addr) {
-	return atoi(atomic_load(png->dest[addr]));
+	return atomic_load(png->dest +addr);
 }
 
 void png_update(png_t *png, addr_t addr, char allow){
 	atomic_char val = '0';
-	atomic_compare_exchange_strong(png->dest[addr], &val, allow);
+	atomic_compare_exchange_strong(png->dest + addr, &val, &allow);
 }
 

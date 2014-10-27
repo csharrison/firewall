@@ -25,5 +25,6 @@ void hist_tear_down(hist_t *hist){
 }
 
 void hist_update(hist_t *hist, uint16_t fingerprint){
-	atomic_fetch_add(hist->dest[fingerprint], 1);
+	atomic_int i = 1;
+	atomic_fetch_add(hist->dest + fingerprint, &i);
 }
