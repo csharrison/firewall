@@ -1,5 +1,6 @@
 #include "types.h"
 #include "stdatomic.h"
+#include "collections/histogram.h"
 /*histogram*/
 
 hist_t *hist_setup(){
