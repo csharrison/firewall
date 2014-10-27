@@ -1,11 +1,15 @@
 #include "collections/PNG.h"
 #include <unistd.h>
+#include <stdatomic.h>
 #include "types.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 /*PNG*/
 
 png_t *png_setup() {
 	png_t *png = (png_t *) malloc(sizeof(png_t));
-	memset(png->dest,0,1<<MAX_ADDR);
+	memset(png->dest,0,MAX_ADDR);
 
 	if (png == NULL){
 		perror("malloc");
