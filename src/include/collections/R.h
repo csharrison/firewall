@@ -1,3 +1,6 @@
+#ifndef R_H
+#define R_H
+
 #include "collections/skip_list.h"
 #include "stdatomic.h"
 /* R */
@@ -17,3 +20,5 @@ void r_tear_down(r_t *r);
 int r_accept(r_t *r, addr_t dest, addr_t src);
 
 void r_update(r_t *r, char to_add, addr_t dest, addr_t begin, addr_t end);
+
+#endif

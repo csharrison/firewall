@@ -2,15 +2,16 @@
 
 void _process_cpacket(writer_info_t *w, cpacket_t *packet);
 
-writer_info_t *writer_setup(squeue_t *queue, png_t *png, r_t *r) {
+writer_info_t *writer_setup(int queue_size, png_t *png, r_t *r) {
 	writer_info_t *w = malloc(sizeof(writer_info_t));
-	w->queue = queue;
+	w->queue = squeue_setup(queue_size);
 	w->png = png;
 	w->r = r;
 	return w;
 }
 
 void writer_tear_down(writer_info_t *w) {
+	squeue_tear_down(w->queue);
 	free(w);
 }
 
@@ -22,6 +23,10 @@ void *writer_start(void *wi) {
 		_process_cpacket(w, packet);
 	}
 	return NULL;
+}
+
+void writer_send_packet(writer_info_t *w, cpacket_t *cp) {
+	squeue_enq(w->queue, (void *)cp);
 }
 
 void _process_cpacket(writer_info_t *w, cpacket_t *p) {

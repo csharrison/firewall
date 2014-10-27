@@ -8,43 +8,33 @@ addr_t _rand_addr(pgen_t *pgen, char type);
 int _get_data_packet(pgen_t *pgen, dpacket_t **dp);
 int _get_config_packet(pgen_t *pgen, cpacket_t **cp);
 
-pgen_t *setup_packet_gen(
-	int num_addresses_log,
-	int num_trains_log,
-	double mean_train_size,
-	double mean_trains_per_comm,
-	int mean_window,
-	int mean_comms_per_address,
-	int mean_work,
-	double config_fraction,
-	double png_fraction,
-	double accepting_fraction) {
+pgen_t *setup_packet_gen(pgen_input_t *i) {
 
     pgen_t *pgen = malloc(sizeof(pgen_t));
-    pgen->exp_mean = (1.0 / config_fraction) - 1;
+    pgen->exp_mean = (1.0 / i->config_fraction) - 1;
     // from AddressPairGenerator
-    pgen->mean_comms_per_address = mean_comms_per_address;
-    pgen->num_addresses_log = num_addresses_log;
-    pgen->mean_window = (double)mean_window;
+    pgen->mean_comms_per_address = i->mean_comms_per_address;
+    pgen->num_addresses_log = i->num_addresses_log;
+    pgen->mean_window = (double)i->mean_window;
     pgen->src_residue = 0.0;
     pgen->dest_residue = 0.0;
-    pgen->speed = 2.0 / ((double) mean_comms_per_address);
+    pgen->speed = 2.0 / ((double) i->mean_comms_per_address);
     pgen->src_seed = 0;
     pgen->dest_seed = 0;
 
 
-    pgen->mask = (1 << num_trains_log) - 1;
-    pgen->addresses_mask = (1 << num_addresses_log) - 1;
+    pgen->mask = (1 << i->num_trains_log) - 1;
+    pgen->addresses_mask = (1 << i->num_addresses_log) - 1;
 
-    pgen->mean_train_size = mean_train_size;
-    pgen->mean_trains_per_comm = mean_trains_per_comm;
+    pgen->mean_train_size = i->mean_train_size;
+    pgen->mean_trains_per_comm = i->mean_trains_per_comm;
 
-    pgen->mean_work = (double) mean_work;
+    pgen->mean_work = (double) i->mean_work;
 
-    pgen->config_address_mask = (1 << (num_addresses_log >> 1)) - 1;
+    pgen->config_address_mask = (1 << (i->num_addresses_log >> 1)) - 1;
 
-    pgen->png_fraction = png_fraction;
-    pgen->accepting_fraction = accepting_fraction;
+    pgen->png_fraction = i->png_fraction;
+    pgen->accepting_fraction = i->accepting_fraction;
 
     pgen->trains = (train_t *)malloc(sizeof(train_t) * (unsigned int)(pgen->mask+1));
     for (int i = 0; i <= pgen->mask; i++) {

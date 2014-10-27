@@ -1,3 +1,6 @@
+#ifndef PNG_H
+#define PNG_H
+
 #include "collections/skip_list.h"
 #include "types.h"
 #include "stdatomic.h"
@@ -13,3 +16,5 @@ void png_tear_down(png_t *png);
 int png_allow(png_t *png, addr_t addr);
 
 void png_update(png_t *png, addr_t addr, char allow);
+
+#endif

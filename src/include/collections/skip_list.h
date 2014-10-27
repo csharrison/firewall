@@ -1,5 +1,5 @@
-#ifndef CONTAINERS_H
-#define CONTAINERS_H
+#ifndef SKIPLIST_H
+#define SKIPLIST_H
 #include "types.h"
 #include <stdint.h>
 #include <time.h>

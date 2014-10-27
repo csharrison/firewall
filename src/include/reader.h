@@ -14,6 +14,7 @@ typedef struct reader_info {
 	hist_t *hist;
 } reader_info_t;
 
-reader_info_t *reader_setup(squeue_t *queue, png_t *png, r_t *r, hist_t *hist);
-void reader_tear_down(reader_info_t *w);
+reader_info_t *reader_setup(int queue_size, png_t *png, r_t *r, hist_t *hist);
+void reader_tear_down(reader_info_t *r);
 void *reader_start(void *wi);
+void reader_send_packet(reader_info_t *r, dpacket_t *dp);

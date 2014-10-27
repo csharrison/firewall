@@ -1,3 +1,6 @@
+#ifndef SQUEUE_H
+#define SQUEUE_H
+
 #include <pthread.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -19,3 +22,5 @@ void *squeue_deq();
 
 // waits
 void *squeue_deq_wait(squeue_t *q);
+
+#endif
