@@ -103,5 +103,4 @@ pgen_t *setup_packet_gen(pgen_input_t *inp);
 
 void tear_down_packet_gen(pgen_t *);
 int get_packet(pgen_t *pgen, dpacket_t **data_packet, cpacket_t **config_packet);
-
 #endif

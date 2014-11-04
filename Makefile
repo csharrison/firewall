@@ -1,7 +1,7 @@
 FEXEC = build/firewall
 FSRC = src/collections/*.c src/packet/*  src/random/* src/*.c -lm
 TEXEC = build/test
-TSRC = src/test/*.c src/collections/skip_list.c src/collections/R.c
+TSRC = src/test/*.c src/collections/skip_list.c src/collections/R.c src/packet/*.c src/random/*.c -lm
 
 CFLAGS= -Wall -Wextra -Wconversion -Wcast-qual -Wcast-align
 CFLAGS +=   -Winline -Wfloat-equal -Wnested-externs
