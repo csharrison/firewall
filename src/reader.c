@@ -22,6 +22,7 @@ void *reader_start(void *wi) {
 
 	while (1) {
 		dpacket_t *packet = (dpacket_t *)squeue_deq_wait(w->queue);
+		if (packet == NULL) break;
 		_process_dpacket(w, packet);
 	}
 	return NULL;
