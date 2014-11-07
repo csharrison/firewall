@@ -8,7 +8,7 @@ addr_t _rand_addr(pgen_t *pgen, char type);
 int _get_data_packet(pgen_t *pgen, dpacket_t **dp);
 int _get_config_packet(pgen_t *pgen, cpacket_t **cp);
 
-pgen_t *setup_packet_gen(pgen_input_t *i) {
+pgen_t *packet_gen_setup(pgen_input_t *i) {
 
     pgen_t *pgen = malloc(sizeof(pgen_t));
     pgen->exp_mean = (1.0 / i->config_fraction) - 1;
@@ -43,6 +43,11 @@ pgen_t *setup_packet_gen(pgen_input_t *i) {
 
     pgen->last_config_address = _rand_addr(pgen, SRC);
     return pgen;
+}
+
+void packet_gen_tear_down(pgen_t *pgen) {
+	free(pgen->trains);
+	free(pgen);
 }
 
 int get_packet(pgen_t *pgen, dpacket_t **dp, cpacket_t **cp) {

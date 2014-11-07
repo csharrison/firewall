@@ -99,8 +99,8 @@ typedef struct pgen_input {
     double accepting_fraction;
 } pgen_input_t;
 
-pgen_t *setup_packet_gen(pgen_input_t *inp);
+pgen_t *packet_gen_setup(pgen_input_t *inp);
 
-void tear_down_packet_gen(pgen_t *);
+void packet_gen_tear_down(pgen_t *);
 int get_packet(pgen_t *pgen, dpacket_t **data_packet, cpacket_t **config_packet);
 #endif

@@ -22,7 +22,7 @@ int test_packets() {
 		.96
 	};
 
-	pgen_t *pgen = setup_packet_gen(&pi);
+	pgen_t *pgen = packet_gen_setup(&pi);
 	for (int i = 0; i < 100; i++) {
 		dpacket_t *dp = NULL;
 		cpacket_t *cp = NULL;
