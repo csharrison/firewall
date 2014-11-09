@@ -5,6 +5,9 @@ dispatcher_t *dispatcher_setup(pgen_t *pgen, int num_readers, int num_writers) {
 	dispatcher_t *d = (dispatcher_t *)malloc(sizeof(dispatcher_t));
 	d->num_readers = num_readers;
 	d->num_writers = num_writers;
+
+	d->in_flight = ATOMIC_VAR_INIT(0);
+
 	d->pgen = pgen;
 	d->png = png_setup();
 	d->r = r_setup(MAX_ADDR);
@@ -15,12 +18,12 @@ dispatcher_t *dispatcher_setup(pgen_t *pgen, int num_readers, int num_writers) {
 	d->iwriters = malloc(sizeof(writer_info_t *) * (unsigned int)num_writers);
 
 	for (int i = 0; i < num_readers; i++) {
-		reader_info_t *reader = reader_setup(MAX_INFLIGHT, d->png, d->r, d->hist);
+		reader_info_t *reader = reader_setup(&d->in_flight, MAX_INFLIGHT, d->png, d->r, d->hist);
 		d->ireaders[i] = reader;
 		pthread_create(&(d->treaders[i]), NULL, reader_start, (void *)reader);
 	}
 	for (int i = 0; i < num_writers; i++) {
-		writer_info_t *w = writer_setup(MAX_INFLIGHT, d->png, d->r);
+		writer_info_t *w = writer_setup(&d->in_flight, MAX_INFLIGHT, d->png, d->r);
 		d->iwriters[i] = w;
 		pthread_create(&(d->twriters[i]), NULL, writer_start, (void *)w);
 	}
@@ -30,15 +33,21 @@ dispatcher_t *dispatcher_setup(pgen_t *pgen, int num_readers, int num_writers) {
 
 void dispatcher_tear_down(dispatcher_t *d) {
 	for (int i = 0; i < d->num_readers; i++) {
-		reader_tear_down(d->ireaders[i]);
+		// send the reader a null packet to stop it
+		reader_send_packet(d->ireaders[i], NULL);
 		pthread_join(d->treaders[i], NULL);
+
+		reader_tear_down(d->ireaders[i]);
 	}
 	free(d->ireaders);
 	free(d->treaders);
 
 	for (int i = 0; i < d->num_writers; i++) {
-		writer_tear_down(d->iwriters[i]);
+		// send the writer a null packet to stop it
+		writer_send_packet(d->iwriters[i], NULL);
 		pthread_join(d->twriters[i], NULL);
+
+		writer_tear_down(d->iwriters[i]);
 	}
 	free(d->iwriters);
 	free(d->twriters);
@@ -53,7 +62,12 @@ void dispatcher_tear_down(dispatcher_t *d) {
 void dispatch(dispatcher_t *d) {
 	cpacket_t *cp = NULL;
 	dpacket_t *dp = NULL;
+
+	while (atomic_load(&d->in_flight) == MAX_INFLIGHT) {}
 	get_packet(d->pgen, &dp, &cp);
+
+	atomic_fetch_add(&d->in_flight, 1);
+
 	assert(cp != NULL || dp != NULL);
 	if (dp != NULL) {
 		reader_info_t *r = d->ireaders[dp->seed % d->num_readers];

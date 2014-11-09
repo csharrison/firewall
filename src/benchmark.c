@@ -1,5 +1,5 @@
 #include "benchmark.h"
-#define READERS 2
+#define READERS 1
 #define WRITERS 1
 #define PACKETS 10000
 
@@ -24,11 +24,11 @@ int main() {
 			dispatch(d);
 		}
 		double time_spent = (double)(clock() - begin) / CLOCKS_PER_SEC;
+		printf("Parameter %d -> %f\n", i, time_spent);
 
 		dispatcher_tear_down(d);
 		packet_gen_tear_down(pgen);
 
-		printf("Parameter %d -> %f\n", i, time_spent);
 	}
 	return 0;
 }

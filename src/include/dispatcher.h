@@ -5,10 +5,14 @@
 #include "writer.h"
 #include "reader.h"
 #include <stdio.h>
+#include <stdatomic.h>
 
 typedef struct dispatcher {
 	int num_readers;
 	int num_writers;
+
+	atomic_int in_flight;
+
 	pgen_t *pgen;
 	png_t *png;
 	r_t *r;
