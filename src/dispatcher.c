@@ -33,20 +33,14 @@ dispatcher_t *dispatcher_setup(pgen_t *pgen, int num_readers, int num_writers) {
 
 void dispatcher_tear_down(dispatcher_t *d) {
 	for (int i = 0; i < d->num_readers; i++) {
-		// send the reader a null packet to stop it
-		reader_send_packet(d->ireaders[i], NULL);
-		pthread_join(d->treaders[i], NULL);
-
+		pthread_cancel(d->treaders[i]);
 		reader_tear_down(d->ireaders[i]);
 	}
 	free(d->ireaders);
 	free(d->treaders);
 
 	for (int i = 0; i < d->num_writers; i++) {
-		// send the writer a null packet to stop it
-		writer_send_packet(d->iwriters[i], NULL);
-		pthread_join(d->twriters[i], NULL);
-
+		pthread_cancel(d->twriters[i]);
 		writer_tear_down(d->iwriters[i]);
 	}
 	free(d->iwriters);

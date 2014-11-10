@@ -23,7 +23,7 @@ void *reader_start(void *ri) {
 
 	while (1) {
 		dpacket_t *packet = (dpacket_t *)squeue_deq_wait(r->queue);
-		if (packet == NULL) break;
+		assert(packet != NULL);
 		_process_dpacket(r, packet);
 
 		atomic_fetch_sub(r->in_flight, 1);
