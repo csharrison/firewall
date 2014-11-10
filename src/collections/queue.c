@@ -2,14 +2,16 @@
 
 squeue_t *squeue_setup(int size) {
 	squeue_t *q = malloc(sizeof(squeue_t));
-	atomic_intptr_t *buff = malloc(sizeof(atomic_intptr_t) * (unsigned int)size);
+	q->buff = malloc(sizeof(atomic_intptr_t) * (unsigned int)size);
+
+	for(int i = 0; i < size; i++) {
+		q->buff[i] = ATOMIC_VAR_INIT(0);
+	}
 
 	q->head = ATOMIC_VAR_INIT(0);
 	q->tail = ATOMIC_VAR_INIT(0);
-	q->size = size;
-	q->buff = buff;
+	q->size = ATOMIC_VAR_INIT(size);
 
-	assert(q->size >0);
 	return q;
 }
 
@@ -19,26 +21,26 @@ void squeue_tear_down(squeue_t *q) {
 }
 
 void squeue_enq(squeue_t *q, void *x) {
-	assert(q->size > 0);
 	assert(q->tail - q->head < q->size);
 
-	int h = atomic_load(&q->head);
+	int t = atomic_load(&q->tail);
+	int s = atomic_load(&q->size);
 
-	atomic_store(q->buff + (h % q->size), (atomic_intptr_t) x);
+	atomic_store(q->buff + (t % s), (intptr_t) x);
 
 	atomic_fetch_add(&q->tail, 1);
 }
 
 void *squeue_deq(squeue_t *q) {
-	assert(q->size > 0);
 	assert(atomic_load(&q->tail) - atomic_load(&q->head) > 0);
 
 	int h = atomic_load(&q->head);
+	int s = atomic_load(&q->size);
 
-	void *x = (void *) atomic_load(q->buff + (h % q->size));
+	intptr_t x =  atomic_load(q->buff + (h % s));
 
 	atomic_fetch_add(&q->head, 1);
-	return x;
+	return (void *)x;
 }
 
 void *squeue_deq_wait(squeue_t *q) {

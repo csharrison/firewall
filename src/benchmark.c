@@ -1,7 +1,7 @@
 #include "benchmark.h"
 #define READERS 1
 #define WRITERS 1
-#define PACKETS 100000
+#define PACKETS 62165
 
 pgen_input_t p1 = {11, 12, 5 , 1 , 3, 3 , 3822, 0.24, 0.04, 0.96};
 pgen_input_t p2 = {12, 10, 1 , 3 , 3, 1 , 2644, 0.11, 0.09, 0.92};
@@ -14,7 +14,7 @@ pgen_input_t p8 = {16, 14, 15, 12, 9, 5 , 8840, 0.04, 0.19, 0.76};
 
 int main() {
 	pgen_input_t ps[] = {p1,p2,p3,p4,p5,p6,p7,p8};
-	for(int i = 0; i < 1; i++) {
+	for(int i = 0; i < 8; i++) {
 		pgen_input_t pi = ps[i];
 		pgen_t *pgen = packet_gen_setup(&pi);
 		dispatcher_t *d = dispatcher_setup(pgen, READERS, WRITERS);

@@ -5,14 +5,16 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdatomic.h>
+#include <string.h>
+#include <stdint.h>
 /*
 	A simple wait-free single enqueuer - single dequeuer queue
 	note: this cannot store more than `size` elements
 */
 typedef struct squeue {
-	int size;
-	atomic_int head;
-	atomic_int tail;
+	_Atomic int size;
+	_Atomic int head;
+	_Atomic int tail;
 	atomic_intptr_t *buff;
 } squeue_t;
 

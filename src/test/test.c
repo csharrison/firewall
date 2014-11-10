@@ -3,7 +3,7 @@
 #include "test_packets.h"
 
 int main(int argc, char **argv) {
-	//test_containers();
-	//test_r();
-	test_packets();
+	test_containers();
+	test_r();
+	//test_packets();
 }

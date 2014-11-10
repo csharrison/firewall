@@ -2,11 +2,16 @@
 #define PNG_H
 
 #include "collections/skip_list.h"
+#include <unistd.h>
+#include <stdatomic.h>
 #include "types.h"
-#include "stdatomic.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
 /*PNG*/
 typedef struct png {
-        atomic_char dest[MAX_ADDR];
+        atomic_char *dest;
 } png_t;
 
 png_t *png_setup();

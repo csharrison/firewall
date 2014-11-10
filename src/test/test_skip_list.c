@@ -19,7 +19,7 @@ int includes_range(skip_list_t *sl, addr_t begin, addr_t end, addr_t expected) {
 void *add_tons(void *vsl) {
 	skip_list_t *sl = (skip_list_t *)vsl;
 	int i;
-	for (i = 0; i < 100; i++) {
+	for (i = 0; i < 70000; i++) {
 		addr_t b = (addr_t) rand();
 		addr_t e = (addr_t) (b + 10);
 		// protect overflows

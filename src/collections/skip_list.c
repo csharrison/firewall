@@ -28,7 +28,7 @@ skip_list_t *skip_list_setup() {
 	//srand((unsigned int) 1/*time(NULL*/);
 	skip_list_t *sl = malloc(sizeof(skip_list_t));
 	node_t *tail = _node_setup(MAX_ADDR, MAX_ADDR, 0);
-	node_t *head = _node_setup(0, 0, MAX_LEVEL + 1);
+	node_t *head = _node_setup(0, 0, MAX_LEVEL+1);
 	pthread_rwlock_t *rwlock = (pthread_rwlock_t *)malloc(sizeof(pthread_rwlock_t));
 	if ((pthread_rwlock_init(rwlock, NULL))) {
 		perror("pthread_rwlock_init");
@@ -47,20 +47,34 @@ skip_list_t *skip_list_setup() {
 }
 
 void skip_list_tear_down(skip_list_t *sl) {
+	int s = 1;
 	node_t *cur = sl->head;
 	while(cur != sl->tail) {
+		cur = cur->next[0];
+		s++;
+	}
+	node_t **nodes = malloc(sizeof(node_t *) * (unsigned int) s);
+	int i = 0;
+	cur = sl->head;
+	while(cur != sl->tail) {
+		nodes[i] = cur;
+		i++;
 		node_t *next = cur->next[0];
-		_node_tear_down(cur);
 		cur = next;
 	}
-	_node_tear_down(sl->tail);
+	nodes[i] = cur;
+
+	for(int i = 0; i < s; i++) {
+		_node_tear_down(nodes[i]);
+	}
+	free(nodes);
 	pthread_rwlock_destroy(sl->rwlock);
 	free(sl);
 }
 
 int skip_list_contains(skip_list_t *sl, addr_t addr) {
 	pthread_rwlock_rdlock(sl->rwlock);
-	int level = _find(sl, addr, addr, NULL, NULL, NULL);
+	int level = _find(sl, addr, addr+1, NULL, NULL, NULL);
 	pthread_rwlock_unlock(sl->rwlock);
 	return level == -1 ? 0 : 1;
 }
@@ -140,8 +154,7 @@ void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end) {
 int _find(skip_list_t *sl, addr_t begin, addr_t end, node_t **preds, node_t **succs, int *overlaps) {
 	int found = -1;
 	node_t *pred = sl->head;
-	int level;
-	for(level = MAX_LEVEL - 1; level >= 0; level--) {
+	for(int level = MAX_LEVEL - 1; level >= 0; level--) {
 		node_t *cur = pred->next[level];
 		assert(cur != NULL);
 		assert(cur->begin > 0);
@@ -204,6 +217,7 @@ node_t *_node_setup(addr_t begin, addr_t end, int height) {
 
 	node_t **next = NULL;
 	if (height > 0) {
+		assert(height <= MAX_LEVEL + 1);
 		next = malloc(sizeof(node_t *) * (unsigned int)(height));
 		memset(next, 0, sizeof(node_t *) * (unsigned int)(height));
 	}

@@ -22,6 +22,7 @@ pgen_t *packet_gen_setup(pgen_input_t *i) {
     pgen->src_seed = 0;
     pgen->dest_seed = 0;
 
+	pgen->time_to_next_config_packet = rng_exp(pgen->exp_mean);
 
     pgen->mask = (1 << i->num_trains_log) - 1;
     pgen->addresses_mask = (1 << i->num_addresses_log) - 1;

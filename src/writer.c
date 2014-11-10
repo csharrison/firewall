@@ -21,7 +21,7 @@ void *writer_start(void *wi) {
 
 	while (1) {
 		cpacket_t *packet = (cpacket_t *)squeue_deq_wait(w->queue);
-		assert(packet != NULL);
+		if(packet == NULL) break;
 		_process_cpacket(w, packet);
 
 		atomic_fetch_sub(w->in_flight, 1);
