@@ -28,16 +28,3 @@ dispatcher_t *dispatcher_setup(pgen_t *pgen, int num_readers, int num_writers);
 void dispatcher_tear_down(dispatcher_t *d);
 
 void dispatch(dispatcher_t *d);
-
-typedef struct serial {
-	pgen_t *pgen;
-	png_t *png;
-	r_t *r;
-	hist_t *hist;
-} serial_t;
-
-serial_t *serial_setup(pgen_t *pgen);
-
-void serial_tear_down(serial_t *d);
-
-void serial_dispatch(serial_t *d);
