@@ -16,4 +16,4 @@ serial_t *serial_setup(pgen_t *pgen);
 
 void serial_tear_down(serial_t *d);
 
-void dispatch(serial_t *d);
+void serial_dispatch(serial_t *d);

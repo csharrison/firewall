@@ -19,7 +19,7 @@ void serial_tear_down(serial_t *s) {
 	free(s);
 }
 
-void dispatch(serial_t *s) {
+void serial_dispatch(serial_t *s) {
 	cpacket_t *cp = NULL;
 	dpacket_t *dp = NULL;
 
