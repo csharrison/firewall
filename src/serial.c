@@ -23,7 +23,6 @@ void dispatch(serial_t *s) {
 	cpacket_t *cp = NULL;
 	dpacket_t *dp = NULL;
 
-	while (atomic_load(&s->in_flight) == MAX_INFLIGHT) {}
 	get_packet(s->pgen, &dp, &cp);
 
 	assert(cp != NULL || dp != NULL);
