@@ -1,6 +1,8 @@
 #include "dispatcher.h"
 #define MAX_INFLIGHT 256
 
+uint16_t _fingerprint(dpacket_t *packet);
+
 dispatcher_t *dispatcher_setup(pgen_t *pgen, int num_readers, int num_writers) {
 	dispatcher_t *d = (dispatcher_t *)malloc(sizeof(dispatcher_t));
 	d->num_readers = num_readers;
