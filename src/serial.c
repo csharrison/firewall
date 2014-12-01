@@ -1,6 +1,8 @@
 #include "serial.h"
 #define MAX_INFLIGHT 256
 
+uint16_t _fingerprint(dpacket_t *packet);
+
 serial_t *serial_setup(pgen_t *pgen) {
 	serial_t *s = (serial_t *)malloc(sizeof(serial_t));
 
