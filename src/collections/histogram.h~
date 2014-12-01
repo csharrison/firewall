@@ -1,0 +1,16 @@
+#include "stdatomic.h"
+/* histogram */
+
+typedef atomic_intptr_t atomic_ref;
+
+typedef struct histogram {
+	addr_t size;
+	int *fngrprnts; //stores the list of the fingerprints
+} histogram_t;
+
+
+histogram_t *histogram_setup(int size);
+
+int histogram_get(histogram_t *r, int dest);
+
+void histogram_increment(histogram_t *r, int dest);
