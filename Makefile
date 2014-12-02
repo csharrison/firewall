@@ -6,7 +6,7 @@ TSRC = src/test/*.c src/collections/skip_list.c src/collections/R.c src/packet/*
 CFLAGS= -Wall -Wextra -Wconversion -Wcast-qual -Wcast-align
 CFLAGS +=   -Winline -Wfloat-equal -Wnested-externs
 CFLAGS +=   -pedantic -std=c11
-CFLAGS +=   -D_GNU_SOURCE -g
+CFLAGS +=   -D_GNU_SOURCE -g  -pg
 CFLAGS +=   -iquotesrc/include -pthread
 
 CC = gcc-4.9

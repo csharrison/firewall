@@ -11,7 +11,7 @@ typedef struct dispatcher {
 	int num_readers;
 	int num_writers;
 
-	atomic_int in_flight;
+	throttler_t *t;
 
 	pgen_t *pgen;
 	png_t *png;
@@ -29,15 +29,8 @@ void dispatcher_tear_down(dispatcher_t *d);
 
 void dispatch(dispatcher_t *d);
 
-typedef struct serial {
-	pgen_t *pgen;
-	png_t *png;
-	r_t *r;
-	hist_t *hist;
-} serial_t;
+dispatcher_t *serial_setup(pgen_t *pgen);
 
-serial_t *serial_setup(pgen_t *pgen);
+void serial_tear_down(dispatcher_t *d);
 
-void serial_tear_down(serial_t *d);
-
-void serial_dispatch(serial_t *d);
+void serial_dispatch(dispatcher_t *d);

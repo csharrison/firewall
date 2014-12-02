@@ -234,6 +234,7 @@ void _node_tear_down(node_t *node) {
 }
 
 char _range_overlaps(addr_t a_s, addr_t a_e, addr_t b_s, addr_t b_e) {
+
 	if (a_s >= b_e) {
 		return RIGHTNO;
 	} else if(a_e <= b_s) {

@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 		for (int i = 0; i < 8; i++){
 		    pgen_input_t pi = ps[i];
 		    pgen_t *pgen = packet_gen_setup(&pi);
-		    serial_t *s = serial_setup(pgen);
+		    dispatcher_t *s = serial_setup(pgen);
 
 		    clock_t begin = clock();
 		    for (int pnum = 0; pnum < PACKETS; pnum++){

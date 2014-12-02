@@ -2,9 +2,9 @@
 
 void _process_cpacket(writer_info_t *w, cpacket_t *packet);
 
-writer_info_t *writer_setup(atomic_int *in_flight, int queue_size, png_t *png, r_t *r) {
+writer_info_t *writer_setup(throttler_t *t, int queue_size, png_t *png, r_t *r) {
 	writer_info_t *w = malloc(sizeof(writer_info_t));
-	w->in_flight = in_flight;
+	w->t = t;
 	w->queue = squeue_setup(queue_size);
 	w->png = png;
 	w->r = r;
@@ -24,7 +24,7 @@ void *writer_start(void *wi) {
 		if(packet == NULL) break;
 		_process_cpacket(w, packet);
 
-		atomic_fetch_sub(w->in_flight, 1);
+		throttler_recieve(w->t);
 		free(packet);
 	}
 	return NULL;

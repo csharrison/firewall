@@ -1,11 +1,10 @@
 #include "reader.h"
-
 void _process_dpacket(reader_info_t *w, dpacket_t *packet);
 uint16_t _fingerprint(dpacket_t *packet);
 
-reader_info_t *reader_setup(atomic_int *in_flight, int queue_size, png_t *png, r_t *r, hist_t *hist) {
+reader_info_t *reader_setup(throttler_t *t, int queue_size, png_t *png, r_t *r, hist_t *hist) {
 	reader_info_t *w = malloc(sizeof(reader_info_t));
-	w->in_flight = in_flight;
+	w->t = t;
 	w->queue = squeue_setup(queue_size);
 	w->png = png;
 	w->r = r;
@@ -26,7 +25,7 @@ void *reader_start(void *ri) {
 		if(packet == NULL) break;
 		_process_dpacket(r, packet);
 
-		atomic_fetch_sub(r->in_flight, 1);
+		throttler_recieve(r->t);
 		free(packet);
 	}
 	return NULL;

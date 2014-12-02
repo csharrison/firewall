@@ -12,12 +12,12 @@
 	note: this cannot store more than `size` elements
 */
 typedef struct squeue {
-	_Atomic int size;
-	_Atomic int head;
-	_Atomic int tail;
+	int size;
+	int head;
+	int tail;
 	pthread_cond_t cond;
 	pthread_mutex_t m;
-	atomic_intptr_t *buff;
+	void **buff;
 } squeue_t;
 
 squeue_t *squeue_setup(int size);

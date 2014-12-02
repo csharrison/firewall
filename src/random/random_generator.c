@@ -12,6 +12,7 @@ int rng_set_seed(int seed) {
 }
 
 int rng_mangle(int seed) {
+    return 0;
     static int CRC_POLY = 954680065; // 0x38E74301 - standard CRC30 from CDMA
     static int iterations = 31;
     int crc = seed;

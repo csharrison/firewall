@@ -2,15 +2,15 @@
 
 squeue_t *squeue_setup(int size) {
 	squeue_t *q = malloc(sizeof(squeue_t));
-	q->buff = malloc(sizeof(atomic_intptr_t) * (unsigned int)size);
+	q->buff = malloc(sizeof(void *) * (unsigned int)size);
 
 	for(int i = 0; i < size; i++) {
-		q->buff[i] = ATOMIC_VAR_INIT(0);
+		q->buff[i] = 0;
 	}
 
-	q->head = ATOMIC_VAR_INIT(0);
-	q->tail = ATOMIC_VAR_INIT(0);
-	q->size = ATOMIC_VAR_INIT(size);
+	q->head = (0);
+	q->tail = (0);
+	q->size = (size);
 
 	pthread_cond_init(&q->cond, NULL);
 	pthread_mutex_init(&q->m, NULL);
@@ -28,34 +28,33 @@ void squeue_tear_down(squeue_t *q) {
 void squeue_enq(squeue_t *q, void *x) {
 	assert(q->tail - q->head < q->size);
 
-	int t = atomic_load(&q->tail);
-	int s = atomic_load(&q->size);
+	int t = q->tail;
+	int s = q->size;
 
-	atomic_store(q->buff + (t % s), (intptr_t) x);
+	q->buff[t %s] = x;
 
 	pthread_mutex_lock(&q->m);
 
-	atomic_fetch_add(&q->tail, 1);
-	pthread_cond_signal(&q->cond);
+	q->tail++;
+	if(q->tail == q->head + 1) {
+		pthread_cond_signal(&q->cond);
+	}
 
 	pthread_mutex_unlock(&q->m);
 }
 
 void *squeue_deq(squeue_t *q) {
-	assert(atomic_load(&q->tail) - atomic_load(&q->head) > 0);
+	assert(q->tail - q->head > 0);
+	void *x = q->buff[q->head % q->size];
 
-	int h = atomic_load(&q->head);
-	int s = atomic_load(&q->size);
-
-	intptr_t x =  atomic_load(q->buff + (h % s));
-
-	atomic_fetch_add(&q->head, 1);
-	return (void *)x;
+	q->head++;
+	return x;
 }
 
 void *squeue_deq_wait(squeue_t *q) {
+
 	pthread_mutex_lock(&q->m);
-	while(atomic_load(&q->tail) - atomic_load(&q->head) == 0) {
+	while(q->tail == q->head) {
 		pthread_cond_wait(&q->cond, &q->m);
 	}
 	pthread_mutex_unlock(&q->m);
