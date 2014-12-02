@@ -12,10 +12,15 @@ squeue_t *squeue_setup(int size) {
 	q->tail = ATOMIC_VAR_INIT(0);
 	q->size = ATOMIC_VAR_INIT(size);
 
+	pthread_cond_init(&q->cond, NULL);
+	pthread_mutex_init(&q->m, NULL);
+
 	return q;
 }
 
 void squeue_tear_down(squeue_t *q) {
+	pthread_cond_destroy(&q->cond);
+	pthread_mutex_destroy(&q->m);
 	free(q->buff);
 	free(q);
 }
@@ -28,7 +33,12 @@ void squeue_enq(squeue_t *q, void *x) {
 
 	atomic_store(q->buff + (t % s), (intptr_t) x);
 
+	pthread_mutex_lock(&q->m);
+
 	atomic_fetch_add(&q->tail, 1);
+	pthread_cond_signal(&q->cond);
+
+	pthread_mutex_unlock(&q->m);
 }
 
 void *squeue_deq(squeue_t *q) {
@@ -44,11 +54,11 @@ void *squeue_deq(squeue_t *q) {
 }
 
 void *squeue_deq_wait(squeue_t *q) {
-	if (atomic_load(&q->tail) - atomic_load(&q->head)) return squeue_deq(q);
-
+	pthread_mutex_lock(&q->m);
 	while(atomic_load(&q->tail) - atomic_load(&q->head) == 0) {
-		// spin spin spin spin
+		pthread_cond_wait(&q->cond, &q->m);
 	}
+	pthread_mutex_unlock(&q->m);
 
 	return squeue_deq(q);
 }
