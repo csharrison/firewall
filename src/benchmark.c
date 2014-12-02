@@ -14,7 +14,7 @@ pgen_input_t p8 = {16, 14, 15, 12, 9, 5 , 8840, 0.04, 0.19, 0.76};
 
 int main(int argc, char **argv) {
 	pgen_input_t ps[] = {p1,p2,p3,p4,p5,p6,p7,p8};
-    if (argc > 1 && strcmp(argv[1],"-s") == 0){ //only run serial version if benchmark wants to
+    if ((argc > 1 && strcmp(argv[1],"-s") == 0) || (argc == 1)){ //only run serial version if benchmark wants to
 		for (int i = 0; i < 8; i++){
 		    pgen_input_t pi = ps[i];
 		    pgen_t *pgen = packet_gen_setup(&pi);
@@ -32,21 +32,23 @@ int main(int argc, char **argv) {
 		}
     }
     //Running multi-threaded version
-	for(int i = 0; i < 8; i++) {
-		pgen_input_t pi = ps[i];
-		pgen_t *pgen = packet_gen_setup(&pi);
-		dispatcher_t *d = dispatcher_setup(pgen, READERS, WRITERS);
+    if ((argc > 1 && strcmp(argv[1],"-m") == 0) || (argc == 1)){
+		for(int i = 0; i < 8; i++) {
+			pgen_input_t pi = ps[i];
+			pgen_t *pgen = packet_gen_setup(&pi);
+			dispatcher_t *d = dispatcher_setup(pgen, READERS, WRITERS);
 
-		clock_t begin = clock();
-		for (int pnum = 0; pnum < PACKETS; pnum++) {
-			dispatch(d);
+			clock_t begin = clock();
+			for (int pnum = 0; pnum < PACKETS; pnum++) {
+				dispatch(d);
+			}
+			double time_spent = (double)(clock() - begin) / CLOCKS_PER_SEC;
+			printf("Parameter %d -> %f\n", i, time_spent);
+
+			dispatcher_tear_down(d);
+			packet_gen_tear_down(pgen);
+
 		}
-		double time_spent = (double)(clock() - begin) / CLOCKS_PER_SEC;
-		printf("Parameter %d -> %f\n", i, time_spent);
-
-		dispatcher_tear_down(d);
-		packet_gen_tear_down(pgen);
-
-	}
+    }
 	return 0;
 }
