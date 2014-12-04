@@ -9,6 +9,7 @@ int _get_data_packet(pgen_t *pgen, dpacket_t **dp);
 int _get_config_packet(pgen_t *pgen, cpacket_t **cp);
 
 pgen_t *packet_gen_setup(pgen_input_t *i) {
+	rng_reset_seed();
 
     pgen_t *pgen = malloc(sizeof(pgen_t));
     pgen->exp_mean = (1.0 / i->config_fraction) - 1;

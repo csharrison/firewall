@@ -3,8 +3,13 @@
 
 
 /* RNG */
-
+int INITSEED = 59009;
 int SEED = 59009;
+
+int rng_reset_seed() {
+    SEED = INITSEED;
+    return SEED;
+}
 
 int rng_set_seed(int seed) {
     SEED = seed;

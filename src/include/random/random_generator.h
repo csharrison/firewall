@@ -2,6 +2,7 @@
 
 int rng_mangle(int seed);
 int rng_rand();
+int rng_reset_seed();
 
 int rng_uniform_max(int max);
 
