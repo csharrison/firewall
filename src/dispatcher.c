@@ -89,32 +89,6 @@ void dispatch(dispatcher_t *d) {
 	send_packet(d, cp, dp);
 }
 
-dispatcher_t *serial_setup(pgen_t *pgen) {
-	dispatcher_t *d = (dispatcher_t *)malloc(sizeof(dispatcher_t));
-	d->num_readers = 0;
-	d->num_writers = 0;
-
-	throttler_t *t = throttler_setup();
-	d->t = t;
-
-	d->pgen = pgen;
-	d->png = png_setup();
-	d->r = r_setup(MAX_ADDR);
-	d->hist = hist_setup();
-	d->treaders = NULL;
-	d->twriters = NULL;
-	d->ireaders = NULL;
-	d->iwriters = NULL;
-	return d;
-}
-
-void serial_tear_down(dispatcher_t *s) {
-	png_tear_down(s->png);
-	r_tear_down(s->r);
-	hist_tear_down(s->hist);
-	free(s);
-}
-
 void serial_dispatch(dispatcher_t *s) {
 	cpacket_t *cp = NULL;
 	dpacket_t *dp = NULL;

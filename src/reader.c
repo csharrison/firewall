@@ -31,18 +31,25 @@ void *reader_start(void *ri) {
 	return NULL;
 }
 
-void reader_send_packet(reader_info_t *r, dpacket_t *dp) {
-	squeue_enq(r->queue, (void *)dp);
-}
-
-void _process_dpacket(reader_info_t *r, dpacket_t *packet) {
+void _process_dpacket(worker_info_t *r, dpacket_t *packet) {
 	if (png_allow(r->png, packet->src) &&
 		r_accept(r->r, packet->dest, packet->src)) {
 		hist_update(r->hist, _fingerprint(packet));
 	}
 }
 
+void _process_cpacket(writer_info_t *w, cpacket_t *p) {
+
+	png_update(w->png, p->address, p->persona_non_grata);
+	r_update(w->r, p->accepting_range, p->address, p->address_begin, p->address_end);
+}
+
 uint16_t _fingerprint(dpacket_t *packet) {
 	// TODO: fingerprint
-	return packet->src;
+	uint16_t prime = 13;
+	uint16_t s = (uint16_t) packet->seed;
+	for(int i = 0; i < packet->iterations * 500 ; i++) {
+		s = s^prime;
+	}
+	return s;
 }
