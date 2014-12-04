@@ -27,10 +27,4 @@ dispatcher_t *dispatcher_setup(pgen_t *pgen, int num_readers, int num_writers);
 
 void dispatcher_tear_down(dispatcher_t *d);
 
-void dispatch(dispatcher_t *d);
-
-dispatcher_t *serial_setup(pgen_t *pgen);
-
-void serial_tear_down(dispatcher_t *d);
-
-void serial_dispatch(dispatcher_t *d);
+void dispatch(dispatcher_t *d, int serial);

@@ -75,26 +75,7 @@ void send_packet(dispatcher_t *d, cpacket_t *cp, dpacket_t *dp) {
 }
 
 
-void dispatch(dispatcher_t *d) {
-
-	if  (! throttler_can_send(d->t, MAX_INFLIGHT)){
-		serial_dispatch(d);
-		return;
-	}
-
-	cpacket_t *cp = NULL;
-	dpacket_t *dp = NULL;
-	get_packet(d->pgen, &dp, &cp);
-
-	send_packet(d, cp, dp);
-}
-
-void serial_dispatch(dispatcher_t *s) {
-	cpacket_t *cp = NULL;
-	dpacket_t *dp = NULL;
-
-	get_packet(s->pgen, &dp, &cp);
-
+void process_serially(dispatcher_t *s, dpacket_t *dp, cpacket_t *cp) {
 	assert(cp != NULL || dp != NULL);
 	if (dp != NULL) {
         //as if a reader processes it
@@ -110,3 +91,17 @@ void serial_dispatch(dispatcher_t *s) {
         free(cp);
 	}
 }
+
+
+void dispatch(dispatcher_t *d, int serial) {
+	cpacket_t *cp = NULL;
+	dpacket_t *dp = NULL;
+	get_packet(d->pgen, &dp, &cp);
+
+	if  (serial || (! throttler_can_send(d->t, MAX_INFLIGHT))) {
+		process_serially(d, dp, cp);
+	} else {
+		send_packet(d, cp, dp);
+	}
+}
+

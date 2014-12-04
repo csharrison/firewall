@@ -1,7 +1,7 @@
 #include "benchmark.h"
-#define READERS 1
+#define READERS 2
 #define WRITERS 1
-#define PACKETS 62165
+#define PACKETS 40000
 
 pgen_input_t p1 = {11, 12, 5 , 1 , 3, 3 , 3822, 0.24, 0.04, 0.96};
 pgen_input_t p2 = {12, 10, 1 , 3 , 3, 1 , 2644, 0.11, 0.09, 0.92};
@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 
 		    clock_t begin = clock();
 		    for (int pnum = 0; pnum < PACKETS; pnum++){
-		        serial_dispatch(s);
+		        dispatch(s, 1);
 		    }
 
 		    double time_spent = (double)(clock() - begin) / CLOCKS_PER_SEC;
@@ -41,9 +41,10 @@ int main(int argc, char **argv) {
 
 			clock_t begin = clock();
 			for (int pnum = 0; pnum < PACKETS; pnum++) {
-				dispatch(d);
+				dispatch(d, 0);
 			}
-			double time_spent = (double)(clock() - begin) / CLOCKS_PER_SEC;
+			clock_t end = clock();
+			double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 			printf("Parameter %d -> %f\n", i, time_spent);
 
 			dispatcher_tear_down(d);
