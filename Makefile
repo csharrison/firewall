@@ -8,6 +8,7 @@ CFLAGS +=   -Winline -Wfloat-equal -Wnested-externs
 CFLAGS +=   -pedantic -std=c11
 CFLAGS +=   -D_GNU_SOURCE -g  -pg
 CFLAGS +=   -iquotesrc/include -pthread
+CFLAGS +=   -lrt
 
 CC = gcc-4.9
 
