@@ -1,4 +1,5 @@
 # Firewall
+csharris and sxchen
 
 ## Architecture 
 For our architecture, we decided to have one dispatcher thread that would process the packet and decide which type of worker thread to pass it onto - a writer or reader thread. We hold onto information about the threads with a PNG, R, Histogram that is universally shared by all the threads. The histogram holds onto the fingerprint results. PNG (persona-non-grata) tells us whether or not a source address is allowed to send a packet. R tells us the permissions for specific destination addresses and that source addresses they are willing to accept from. R has a coarse grained lock on it so that no more than one thread has access to it at one time, so each thread is processed serially. Each worker thread will have its own work queue that has a mutex lock on it as well.
