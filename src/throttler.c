@@ -7,6 +7,11 @@ throttler_t *throttler_setup() {
 	return t;
 }
 
+void throttler_tear_down(throttler_t *t){
+    pthread_mutex_destroy(&t->m);
+	free(t);
+}
+
 void throttler_send(throttler_t *t) {
 	pthread_mutex_lock(&t->m);
 	t->in_flight++;

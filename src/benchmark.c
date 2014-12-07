@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     	double st = serial_times[i];
     	double mt = multi_times[i];
     	if (st > 0 && mt > 0) {
-    		printf("%f\n", st/mt);
+    		printf("%f\n", mt/st);
     	}
     }
 	return 0;

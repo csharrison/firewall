@@ -11,6 +11,7 @@ typedef struct throttler {
 } throttler_t;
 
 throttler_t *throttler_setup();
+void throttler_tear_down(throttler_t *t);
 void throttler_send(throttler_t *t);
 void throttler_recieve(throttler_t *t);
 char throttler_can_send(throttler_t *t, int max);
