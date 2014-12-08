@@ -16,8 +16,11 @@ Created fingerprint method to make it more realistic to add runtime to serial ve
 Improved with first 2 parameter mixes.
 Created own timing method to avoid bottleneck from that and created throttler that had a mutex.
 Improved with first 3 parameter mixes. 
+Found bug in skip_list. Fixed it. Can now send hundreds of thousands of packets without segfaulting!!!
 
 ## Experiments
-
-
+We originally created a queue with spinlocks, but quickly that this was inefficient due to scheduling. Threads were being scheduled and they were just spinning. So instead, we changed it to use condition variables and mutexes and this improved the runtime.
+Next, 
+![chart]
+[chart]: https://github.com/csharrison/firewall/blob/master/chart.png
 ## Conclusions
