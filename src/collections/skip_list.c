@@ -27,6 +27,11 @@ skip_list_t *skip_list_setup() {
 	// seed the random number generator
 	//srand((unsigned int) 1/*time(NULL*/);
 	skip_list_t *sl = malloc(sizeof(skip_list_t));
+	if(sl == NULL) {
+		perror("malloc");
+		return NULL;
+	}
+
 	node_t *tail = _node_setup(MAX_ADDR, MAX_ADDR, 0);
 	node_t *head = _node_setup(0, 0, MAX_LEVEL+1);
 	pthread_rwlock_t *rwlock = (pthread_rwlock_t *)malloc(sizeof(pthread_rwlock_t));
@@ -50,25 +55,18 @@ void skip_list_tear_down(skip_list_t *sl) {
 	int s = 1;
 	node_t *cur = sl->head;
 	while(cur != sl->tail) {
-		cur = cur->next[0];
-		s++;
+		if(!(cur->begin == 0 && cur->end == 0 && cur->height == 0)) {
+			node_t *n = cur->next[0];
+			_node_tear_down(cur);
+			cur = n;
+			s++;
+		} else {
+			assert(0 && "memory corruption :(");
+		}
 	}
-	node_t **nodes = malloc(sizeof(node_t *) * (unsigned int) s);
-	int i = 0;
-	cur = sl->head;
-	while(cur != sl->tail) {
-		nodes[i] = cur;
-		i++;
-		node_t *next = cur->next[0];
-		cur = next;
-	}
-	nodes[i] = cur;
-
-	for(int i = 0; i < s; i++) {
-		_node_tear_down(nodes[i]);
-	}
-	free(nodes);
+	_node_tear_down(sl->tail);
 	pthread_rwlock_destroy(sl->rwlock);
+	free(sl->rwlock);
 	free(sl);
 }
 
@@ -212,6 +210,11 @@ void _link_from_arrs(node_t *node, node_t **preds, node_t **succs) {
 
 node_t *_node_setup(addr_t begin, addr_t end, int height) {
 	node_t *node = malloc(sizeof(node_t));
+	if (node == NULL) {
+		perror("_node_setup");
+		return NULL;
+	}
+
 	node->begin = begin;
 	node->end = end;
 
@@ -219,6 +222,11 @@ node_t *_node_setup(addr_t begin, addr_t end, int height) {
 	if (height > 0) {
 		assert(height <= MAX_LEVEL + 1);
 		next = malloc(sizeof(node_t *) * (unsigned int)(height));
+		if (next == NULL) {
+			perror("_node_setup");
+			free(node);
+			return NULL;
+		}
 		memset(next, 0, sizeof(node_t *) * (unsigned int)(height));
 	}
 	assert(height == 0 || next != NULL);

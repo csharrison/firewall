@@ -36,9 +36,10 @@ void reader_send_packet(reader_info_t *r, dpacket_t *dp) {
 }
 
 void _process_dpacket(reader_info_t *r, dpacket_t *packet) {
-	if (png_allow(r->png, packet->src) &&
-		r_accept(r->r, packet->dest, packet->src)) {
-		hist_update(r->hist, _fingerprint(packet));
+	if (png_allow(r->png, packet->src)) {
+		if (r_accept(r->r, packet->dest, packet->src)) {
+			hist_update(r->hist, _fingerprint(packet));
+		}
 	}
 }
 

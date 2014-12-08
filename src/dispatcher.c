@@ -59,7 +59,7 @@ void dispatcher_tear_down(dispatcher_t *d) {
 	png_tear_down(d->png);
 	r_tear_down(d->r);
 	hist_tear_down(d->hist);
-
+	throttler_tear_down(d->t);
 	free(d);
 }
 void send_packet(dispatcher_t *d, cpacket_t *cp, dpacket_t *dp) {
