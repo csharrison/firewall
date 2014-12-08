@@ -143,6 +143,10 @@ void skip_list_remove_range(skip_list_t *sl, addr_t begin, addr_t end) {
 			assert(next == succ);
 		} else if (overlap == LEFTO)  {
 			curr->end = begin;
+			// shit fuck bug
+			for(int level = 0; level < curr->height; level++) {
+				preds[level] = curr;
+			}
 		} else assert(1 == 0 && "should not be overlapped");
 		curr = next;
 	}
@@ -155,7 +159,6 @@ int _find(skip_list_t *sl, addr_t begin, addr_t end, node_t **preds, node_t **su
 	for(int level = MAX_LEVEL - 1; level >= 0; level--) {
 		node_t *cur = pred->next[level];
 		assert(cur != NULL);
-		assert(cur->begin > 0);
 		int overlap;
 		int last_overlap = 0;
 		while((overlap = _range_overlaps(begin, end, cur->begin, cur->end)) != LEFTNO) {
@@ -193,8 +196,13 @@ void _link_node(node_t *node, node_t *replacing, node_t *pred) {
 }
 
 void _link_over_node(node_t *node, node_t **preds) {
-	for (int l = 0; l < node->height; l++) {
+	for (int l = 0; l < MAX_LEVEL; l++) {
+		if (l < node->height) {
+			assert(preds[l]->next[l] == node);
+		}
+
 		if (preds[l]->next[l] == node) {
+			assert(l < node->height);
 			preds[l]->next[l] = node->next[l];
 		}
 	}
