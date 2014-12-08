@@ -86,7 +86,7 @@ Our Skip List also contains our linked list structure.
 ## How To Run
 ```
 make
-./build/firewall
+./build/firewall <num_readers> <num_writers>
 Optional Flags: 
 * -s for only serial
 * -m for only multithreaded
