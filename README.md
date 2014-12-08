@@ -84,8 +84,9 @@ For R, the skiplist we implemented is a skip list of ranges following the textbo
 Our Skip List also contains our linked list structure. 
 
 ## How To Run
-make
+```make
 ./build/firewall
 Optional Flags: 
 * -s for only serial
 * -m for only multithreaded
+```
